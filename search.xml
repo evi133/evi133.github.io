@@ -51,7 +51,7 @@
 <p>文件内容</p>
 <figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span> <span class="title function_ invoke__">phpinfo</span>();<span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
 
-<p><img src="/Linux%E4%B8%8BDocker%E9%83%A8%E7%BD%B2LAMP%E8%B8%A9%E7%9A%84%E5%B0%8F%E5%9D%91/phpinfo.png" alt="phpinfo"></p>
+<p><img src="/images/Linux%E4%B8%8BDocker%E9%83%A8%E7%BD%B2LAMP%E8%B8%A9%E7%9A%84%E5%B0%8F%E5%9D%91/phpinfo.png" alt="phpinfo"></p>
 <p>成功解析</p>
 ]]></content>
       <tags>
