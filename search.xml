@@ -2,7 +2,7 @@
 <search>
   <entry>
     <title>Linux下Docker部署LAMP踩的小坑</title>
-    <url>/2022/11/19/l1/</url>
+    <url>/docker_LAMP/</url>
     <content><![CDATA[<h2 id="1-环境准备"><a href="#1-环境准备" class="headerlink" title="1.环境准备"></a>1.环境准备</h2><p>安装了Docker的Linux系统</p>
 <h2 id="2-获取ubuntu基础镜像"><a href="#2-获取ubuntu基础镜像" class="headerlink" title="2.获取ubuntu基础镜像"></a>2.获取ubuntu基础镜像</h2><p>拉一个18.04版本的ubuntu镜像</p>
 <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">docker pull ubuntu:18.04</span><br></pre></td></tr></table></figure>
@@ -61,7 +61,7 @@
   </entry>
   <entry>
     <title>记一次js加密算法逆向</title>
-    <url>/2022/11/22/l2/</url>
+    <url>/js_decrypt/</url>
     <content><![CDATA[<h1 id="1-前言"><a href="#1-前言" class="headerlink" title="1.前言"></a>1.前言</h1><p>随着企业对安全越来越重视,前端加密也称为了企业防护的重要手段,以下过程仅记录学习过程</p>
 <h1 id="2-过程"><a href="#2-过程" class="headerlink" title="2.过程"></a>2.过程</h1><h2 id="2-1-加密"><a href="#2-1-加密" class="headerlink" title="2.1 加密"></a>2.1 加密</h2><p>就拿登录功能为例,浏览器抓一下登录的包</p>
 <p><img src="/../images/%E8%AE%B0%E4%B8%80%E6%AC%A1js%E5%8A%A0%E5%AF%86%E7%AE%97%E6%B3%95%E9%80%86%E5%90%91/image-20221122195844875.png" alt="image-20221122195844875"></p>
