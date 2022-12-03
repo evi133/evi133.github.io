@@ -334,7 +334,7 @@
 
 <p>通过遍历数字,遍历到68时,返回正常界面,第一个列的列名第一个字符的ascii码值为68,即为D</p>
 <p><img src="/../images/sqli%E9%9D%B6%E5%9C%BA%E5%AD%A6%E4%B9%A0%E8%A6%81%E7%82%B9%E6%80%BB%E7%BB%93/image-20221201160901890.png" alt="image-20221201160901890"></p>
-<h3 id="2-3-5-堆叠查询"><a href="#2-3-5-堆叠查询" class="headerlink" title="2.3.5 堆叠查询"></a>2.3.5 堆叠查询</h3><h4 id="前置知识-4"><a href="#前置知识-4" class="headerlink" title="前置知识"></a>前置知识</h4><p>堆叠注入是指执行多条SQL语句,在MySQL中,每一条语句后加**;<strong>表示语句结束,我们就可以多条语句一起执行,但是只有PHP使用</strong>mysqli_multi_query**函数时,才能造成堆叠查询</p>
+<h3 id="2-3-5-堆叠查询"><a href="#2-3-5-堆叠查询" class="headerlink" title="2.3.5 堆叠查询"></a>2.3.5 堆叠查询</h3><h4 id="前置知识-4"><a href="#前置知识-4" class="headerlink" title="前置知识"></a>前置知识</h4><p>堆叠注入是指执行多条SQL语句,在MySQL中,每一条语句后加;表示语句结束,我们就可以多条语句一起执行,但是只有PHP使用<strong>mysqli_multi_query</strong>函数时,才能造成堆叠查询</p>
 <p><strong>和联合查询的区别:</strong></p>
 <p>联合查询可以执行的句子是有限的,堆叠查询可以执行任意语句,但是这种注入方式不是十分完美的,在web系统中,代码通常只返回一个查询结果,因此堆叠注入第二条语句产生的错误或结果只能被忽略,在前端是无法看到返回结果的,因此在读取数据时,建议使用联合查询,同时在使用堆叠注入之前,我们也是需要知道一些数据库信息的,例如表名、列名</p>
 <h4 id="注入方法-4"><a href="#注入方法-4" class="headerlink" title="注入方法"></a>注入方法</h4><h5 id="添加数据"><a href="#添加数据" class="headerlink" title="添加数据"></a>添加数据</h5><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&#x27;;insert into users(id,username,password) values (999,&#x27;test&#x27;,&#x27;test&#x27;);</span><br></pre></td></tr></table></figure>
