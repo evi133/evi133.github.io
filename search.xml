@@ -1,65 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>Linux下Docker部署LAMP踩的小坑</title>
-    <url>//blogs/docker_LAMP/</url>
-    <content><![CDATA[<h2 id="1-环境准备"><a href="#1-环境准备" class="headerlink" title="1.环境准备"></a>1.环境准备</h2><p>安装了Docker的Linux系统</p>
-<h2 id="2-获取ubuntu基础镜像"><a href="#2-获取ubuntu基础镜像" class="headerlink" title="2.获取ubuntu基础镜像"></a>2.获取ubuntu基础镜像</h2><p>拉一个18.04版本的ubuntu镜像</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">docker pull ubuntu:18.04</span><br></pre></td></tr></table></figure>
-
-<p>进入容器</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">docker run -it ubuntu:18.04 /bin/bash</span><br></pre></td></tr></table></figure>
-
-<p>换源,这里我选择的是阿里云的源,因为镜像中没有安装vim,所以用echo写入内容</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">mv /etc/apt/sources.list /etc/apt/sources.list.bak	#备份源文件</span><br><span class="line">echo &quot;deb http://mirrors.aliyun.com/ubuntu/ bionic main restricted universe multiverse&quot; &gt;/etc/apt/sources.list</span><br><span class="line">echo &quot;deb http://mirrors.aliyun.com/ubuntu/ bionic-security main restricted universe multiverse&quot; &gt;&gt;/etc/apt/sources.list</span><br><span class="line">echo &quot;deb http://mirrors.aliyun.com/ubuntu/ bionic-updates main restricted universe multiverse&quot; &gt;&gt;/etc/apt/sources.list</span><br><span class="line">echo &quot;deb http://mirrors.aliyun.com/ubuntu/ bionic-proposed main restricted universe multiverse&quot; &gt;&gt;/etc/apt/sources.list</span><br><span class="line">echo &quot;deb http://mirrors.aliyun.com/ubuntu/ bionic-backports main restricted universe multiverse&quot; &gt;&gt;/etc/apt/sources.list</span><br><span class="line">echo &quot;deb-src http://mirrors.aliyun.com/ubuntu/ bionic main restricted universe multiverse&quot; &gt;&gt;/etc/apt/sources.list</span><br><span class="line">echo &quot;deb-src http://mirrors.aliyun.com/ubuntu/ bionic-security main restricted universe multiverse&quot; &gt;&gt;/etc/apt/sources.list</span><br><span class="line">echo &quot;deb-src http://mirrors.aliyun.com/ubuntu/ bionic-updates main restricted universe multiverse&quot; &gt;&gt;/etc/apt/sources.list</span><br><span class="line">echo &quot;deb-src http://mirrors.aliyun.com/ubuntu/ bionic-proposed main restricted universe multiverse&quot; &gt;&gt;/etc/apt/sources.list</span><br><span class="line">echo &quot;deb-src http://mirrors.aliyun.com/ubuntu/ bionic-backports main restricted universe multiverse&quot; &gt;&gt;/etc/apt/sources.list</span><br></pre></td></tr></table></figure>
-
-<p>更新源列表</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">apt-get update</span><br></pre></td></tr></table></figure>
-
-<h2 id="3-安装依赖"><a href="#3-安装依赖" class="headerlink" title="3.安装依赖"></a>3.安装依赖</h2><h3 id="3-1-Mysql"><a href="#3-1-Mysql" class="headerlink" title="3.1 Mysql"></a>3.1 Mysql</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">apt-get install mysql-server</span><br></pre></td></tr></table></figure>
-
-<p><strong>坑:</strong></p>
-<p>安装完成后启动mysql报错</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">ERROR 2002 (HY000): Can&#x27;t connect to local MySQL server through socket &#x27;/var/run/mysqld/mysqld.sock&#x27; (2)</span><br></pre></td></tr></table></figure>
-
-<p><strong>解决方案:</strong></p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">mkdir -p /var/run/mysqld</span><br><span class="line">chown mysql /var/run/mysqld/</span><br><span class="line">service mysql restart</span><br><span class="line">mysql	//进入mysql</span><br><span class="line">ALTER USER &#x27;root&#x27;@&#x27;localhost&#x27; IDENTIFIED WITH mysql_native_password BY &#x27;root&#x27;; //设置密码</span><br></pre></td></tr></table></figure>
-
-<p>然后进入mysql,即可正常连接</p>
-<h3 id="3-2-Apache"><a href="#3-2-Apache" class="headerlink" title="3.2 Apache"></a>3.2 Apache</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">apt-get install apache2</span><br></pre></td></tr></table></figure>
-
-<p><strong>坑</strong></p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">[Sat Nov 19 06:52:00.409930 2022] [core:warn] [pid 2080] AH00111: Config variable $&#123;APACHE_RUN_DIR&#125; is not defined</span><br><span class="line">apache2: Syntax error on line 80 of /etc/apache2/apache2.conf: DefaultRuntimeDir must be a valid directory, absolute or relative to ServerRoot</span><br></pre></td></tr></table></figure>
-
-<p><strong>解决方案:</strong></p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">mkdir /var/run/apache2</span><br><span class="line">service apache2 start</span><br></pre></td></tr></table></figure>
-
-<h3 id="3-3-PHP"><a href="#3-3-PHP" class="headerlink" title="3.3 PHP"></a>3.3 PHP</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">apt-get install php</span><br><span class="line">apt-get install php-mysql</span><br><span class="line">apt-get install libapache2-mod-php</span><br></pre></td></tr></table></figure>
-
-<p>安装完后查看版本如下,即表示安装成功</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">root@447e37cf48ee:/etc/apache2/sites-enabled# php -version</span><br><span class="line">PHP 7.2.24-0ubuntu0.18.04.15 (cli) (built: Nov  2 2022 09:09:52) ( NTS )</span><br><span class="line">Copyright (c) 1997-2018 The PHP Group</span><br><span class="line">Zend Engine v3.2.0, Copyright (c) 1998-2018 Zend Technologies</span><br><span class="line">    with Zend OPcache v7.2.24-0ubuntu0.18.04.15, Copyright (c) 1999-2018, by Zend Technologies</span><br></pre></td></tr></table></figure>
-
-<p><strong>坑</strong></p>
-<p>在&#x2F;var&#x2F;www&#x2F;html下创建一个phpinfo文件,打开显示空白</p>
-<p><strong>解决方案:</strong></p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">vim /etc/php/7.2/apache2/php.ini</span><br></pre></td></tr></table></figure>
-
-<p>首先看下<strong>disable_functions</strong>是否有phpinfo,再将<strong>short_open_tag &#x3D; Off</strong>取消注释并改为<strong>short_open_tag &#x3D; On</strong></p>
-<h2 id="4-测试"><a href="#4-测试" class="headerlink" title="4.测试"></a>4.测试</h2><p>此时LAMP环境就搭好了,我们可以在创建一个php文件看是否能解析</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">cd /var/www/html</span><br><span class="line">vim test.php</span><br></pre></td></tr></table></figure>
-
-<p>文件内容</p>
-<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span> <span class="title function_ invoke__">phpinfo</span>();<span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
-
-<p><img src="/images/Linux%E4%B8%8BDocker%E9%83%A8%E7%BD%B2LAMP%E8%B8%A9%E7%9A%84%E5%B0%8F%E5%9D%91/phpinfo.png" alt="phpinfo"></p>
-<p>成功解析</p>
-]]></content>
-      <tags>
-        <tag>Docker</tag>
-        <tag>LAMP</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>sqli靶场学习要点总结</title>
     <url>//blogs/sql_injection/</url>
     <content><![CDATA[<h1 id="1-项目准备"><a href="#1-项目准备" class="headerlink" title="1.项目准备"></a>1.项目准备</h1><p><strong>项目地址:</strong> <a href="https://github.com/Audi-1/sqli-labs">https://github.com/Audi-1/sqli-labs</a></p>
@@ -283,6 +224,104 @@
       <tags>
         <tag>sql注入</tag>
         <tag>靶场</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Linux下Docker部署LAMP踩的小坑</title>
+    <url>//blogs/docker_LAMP/</url>
+    <content><![CDATA[<h2 id="1-环境准备"><a href="#1-环境准备" class="headerlink" title="1.环境准备"></a>1.环境准备</h2><p>安装了Docker的Linux系统</p>
+<h2 id="2-获取ubuntu基础镜像"><a href="#2-获取ubuntu基础镜像" class="headerlink" title="2.获取ubuntu基础镜像"></a>2.获取ubuntu基础镜像</h2><p>拉一个18.04版本的ubuntu镜像</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">docker pull ubuntu:18.04</span><br></pre></td></tr></table></figure>
+
+<p>进入容器</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">docker run -it ubuntu:18.04 /bin/bash</span><br></pre></td></tr></table></figure>
+
+<p>换源,这里我选择的是阿里云的源,因为镜像中没有安装vim,所以用echo写入内容</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">mv /etc/apt/sources.list /etc/apt/sources.list.bak	#备份源文件</span><br><span class="line">echo &quot;deb http://mirrors.aliyun.com/ubuntu/ bionic main restricted universe multiverse&quot; &gt;/etc/apt/sources.list</span><br><span class="line">echo &quot;deb http://mirrors.aliyun.com/ubuntu/ bionic-security main restricted universe multiverse&quot; &gt;&gt;/etc/apt/sources.list</span><br><span class="line">echo &quot;deb http://mirrors.aliyun.com/ubuntu/ bionic-updates main restricted universe multiverse&quot; &gt;&gt;/etc/apt/sources.list</span><br><span class="line">echo &quot;deb http://mirrors.aliyun.com/ubuntu/ bionic-proposed main restricted universe multiverse&quot; &gt;&gt;/etc/apt/sources.list</span><br><span class="line">echo &quot;deb http://mirrors.aliyun.com/ubuntu/ bionic-backports main restricted universe multiverse&quot; &gt;&gt;/etc/apt/sources.list</span><br><span class="line">echo &quot;deb-src http://mirrors.aliyun.com/ubuntu/ bionic main restricted universe multiverse&quot; &gt;&gt;/etc/apt/sources.list</span><br><span class="line">echo &quot;deb-src http://mirrors.aliyun.com/ubuntu/ bionic-security main restricted universe multiverse&quot; &gt;&gt;/etc/apt/sources.list</span><br><span class="line">echo &quot;deb-src http://mirrors.aliyun.com/ubuntu/ bionic-updates main restricted universe multiverse&quot; &gt;&gt;/etc/apt/sources.list</span><br><span class="line">echo &quot;deb-src http://mirrors.aliyun.com/ubuntu/ bionic-proposed main restricted universe multiverse&quot; &gt;&gt;/etc/apt/sources.list</span><br><span class="line">echo &quot;deb-src http://mirrors.aliyun.com/ubuntu/ bionic-backports main restricted universe multiverse&quot; &gt;&gt;/etc/apt/sources.list</span><br></pre></td></tr></table></figure>
+
+<p>更新源列表</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">apt-get update</span><br></pre></td></tr></table></figure>
+
+<h2 id="3-安装依赖"><a href="#3-安装依赖" class="headerlink" title="3.安装依赖"></a>3.安装依赖</h2><h3 id="3-1-Mysql"><a href="#3-1-Mysql" class="headerlink" title="3.1 Mysql"></a>3.1 Mysql</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">apt-get install mysql-server</span><br></pre></td></tr></table></figure>
+
+<p><strong>坑:</strong></p>
+<p>安装完成后启动mysql报错</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">ERROR 2002 (HY000): Can&#x27;t connect to local MySQL server through socket &#x27;/var/run/mysqld/mysqld.sock&#x27; (2)</span><br></pre></td></tr></table></figure>
+
+<p><strong>解决方案:</strong></p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">mkdir -p /var/run/mysqld</span><br><span class="line">chown mysql /var/run/mysqld/</span><br><span class="line">service mysql restart</span><br><span class="line">mysql	//进入mysql</span><br><span class="line">ALTER USER &#x27;root&#x27;@&#x27;localhost&#x27; IDENTIFIED WITH mysql_native_password BY &#x27;root&#x27;; //设置密码</span><br></pre></td></tr></table></figure>
+
+<p>然后进入mysql,即可正常连接</p>
+<h3 id="3-2-Apache"><a href="#3-2-Apache" class="headerlink" title="3.2 Apache"></a>3.2 Apache</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">apt-get install apache2</span><br></pre></td></tr></table></figure>
+
+<p><strong>坑</strong></p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">[Sat Nov 19 06:52:00.409930 2022] [core:warn] [pid 2080] AH00111: Config variable $&#123;APACHE_RUN_DIR&#125; is not defined</span><br><span class="line">apache2: Syntax error on line 80 of /etc/apache2/apache2.conf: DefaultRuntimeDir must be a valid directory, absolute or relative to ServerRoot</span><br></pre></td></tr></table></figure>
+
+<p><strong>解决方案:</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">mkdir /var/run/apache2</span><br><span class="line">service apache2 start</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-3-PHP"><a href="#3-3-PHP" class="headerlink" title="3.3 PHP"></a>3.3 PHP</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">apt-get install php</span><br><span class="line">apt-get install php-mysql</span><br><span class="line">apt-get install libapache2-mod-php</span><br></pre></td></tr></table></figure>
+
+<p>安装完后查看版本如下,即表示安装成功</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">root@447e37cf48ee:/etc/apache2/sites-enabled# php -version</span><br><span class="line">PHP 7.2.24-0ubuntu0.18.04.15 (cli) (built: Nov  2 2022 09:09:52) ( NTS )</span><br><span class="line">Copyright (c) 1997-2018 The PHP Group</span><br><span class="line">Zend Engine v3.2.0, Copyright (c) 1998-2018 Zend Technologies</span><br><span class="line">    with Zend OPcache v7.2.24-0ubuntu0.18.04.15, Copyright (c) 1999-2018, by Zend Technologies</span><br></pre></td></tr></table></figure>
+
+<p><strong>坑</strong></p>
+<p>在&#x2F;var&#x2F;www&#x2F;html下创建一个phpinfo文件,打开显示空白</p>
+<p><strong>解决方案:</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">vim /etc/php/7.2/apache2/php.ini</span><br></pre></td></tr></table></figure>
+
+<p>首先看下<strong>disable_functions</strong>是否有phpinfo,再将<strong>short_open_tag &#x3D; Off</strong>取消注释并改为<strong>short_open_tag &#x3D; On</strong></p>
+<h2 id="4-测试"><a href="#4-测试" class="headerlink" title="4.测试"></a>4.测试</h2><p>此时LAMP环境就搭好了,我们可以在创建一个php文件看是否能解析</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">cd /var/www/html</span><br><span class="line">vim test.php</span><br></pre></td></tr></table></figure>
+
+<p>文件内容</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span> <span class="title function_ invoke__">phpinfo</span>();<span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Linux%E4%B8%8BDocker%E9%83%A8%E7%BD%B2LAMP%E8%B8%A9%E7%9A%84%E5%B0%8F%E5%9D%91/phpinfo.png" alt="phpinfo"></p>
+<p>成功解析</p>
+]]></content>
+      <tags>
+        <tag>Docker</tag>
+        <tag>LAMP</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>微信小程序反编译方法</title>
+    <url>//blogs/wxapp_decompile/</url>
+    <content><![CDATA[<h1 id="1-准备工作"><a href="#1-准备工作" class="headerlink" title="1.准备工作"></a>1.准备工作</h1><p>**nodejs:**<a href="https://nodejs.org/zh-cn/download/">https://nodejs.org/zh-cn/download/</a></p>
+<p>**wxappUnpacker:**<a href="https://github.com/xuedingmiaojun/wxappUnpacker">https://github.com/xuedingmiaojun/wxappUnpacker</a></p>
+<p>**夜神模拟器6.6.1.1:**<a href="https://support.yeshen.com/zh-CN/win-release">https://support.yeshen.com/zh-CN/win-release</a></p>
+<p>**微信8.0.24(32位):**<a href="https://weixin.qq.com/cgi-bin/readtemplate?lang=zh_CN&amp;t=weixin_faq_list&amp;head=true">https://weixin.qq.com/cgi-bin/readtemplate?lang=zh_CN&amp;t=weixin_faq_list&amp;head=true</a></p>
+<p><strong>文件管理器</strong></p>
+<h1 id="2-反编译微信小程序"><a href="#2-反编译微信小程序" class="headerlink" title="2.反编译微信小程序"></a>2.反编译微信小程序</h1><h2 id="2-1-删除多余小程序包"><a href="#2-1-删除多余小程序包" class="headerlink" title="2.1 删除多余小程序包"></a>2.1 删除多余小程序包</h2><p>为了避免小程序包太多,先用文件管理器把小程序的包全部删除完</p>
+<p>存放小程序包的路径为</p>
+<p>&#x2F;data&#x2F;data&#x2F;com.tencent.mm&#x2F;MicroMsg&#x2F;{User哈希值}&#x2F;appbrand&#x2F;pkg</p>
+<p>如果有多个user哈希值的目录,不清楚哪个是当前登录账号的目录,可以随便打开一个小程序,然后进入文件管理器按照时间排序,最近修改的文件夹基本上就是当前登录账号的文件夹了</p>
+<p>将文件夹内的内容全部删除</p>
+<p><img src="/../images/%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E5%8F%8D%E7%BC%96%E8%AF%91%E6%96%B9%E6%B3%95/image-20221204161559427.png" alt="image-20221204161559427"></p>
+<h2 id="2-2-获取小程序包"><a href="#2-2-获取小程序包" class="headerlink" title="2.2 获取小程序包"></a>2.2 获取小程序包</h2><p>手机进入小程序,会在对应目录生成几个包,包大致分为三种:基础包、主包、分包,基础包一般内存最大,主包其次,最小的是分包</p>
+<p>用微信打开小程序,然后返回小程序包存放目录查看</p>
+<p><img src="/../images/%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E5%8F%8D%E7%BC%96%E8%AF%91%E6%96%B9%E6%B3%95/image-20221204162000740.png" alt="image-20221204162000740"></p>
+<p>将包保存到电脑上,模拟器有文件传输助手,将文件移动到指定目录即可移动到电脑上</p>
+<p><img src="/../images/%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E5%8F%8D%E7%BC%96%E8%AF%91%E6%96%B9%E6%B3%95/image-20221204162126779.png" alt="image-20221204162126779"></p>
+<h2 id="2-3-反编译小程序包"><a href="#2-3-反编译小程序包" class="headerlink" title="2.3 反编译小程序包"></a>2.3 反编译小程序包</h2><p>先反编译主包,进入wxappUnpacker目录,执行命令</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">node wuWxapkg.js &quot;小程序包地址&quot;</span><br></pre></td></tr></table></figure>
+
+<p><img src="/../images/%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E5%8F%8D%E7%BC%96%E8%AF%91%E6%96%B9%E6%B3%95/image-20221204162852271.png" alt="image-20221204162852271"></p>
+<p>执行完成之后会在小程序包目录生成一个同名文件夹,里面就是小程序反编译后的源码</p>
+<p><img src="/../images/%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E5%8F%8D%E7%BC%96%E8%AF%91%E6%96%B9%E6%B3%95/image-20221204162951377.png" alt="image-20221204162951377"></p>
+<p>然后反编译分包</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">node wuWxapkg.js &quot;小程序包地址&quot; -s=存放路径</span><br></pre></td></tr></table></figure>
+
+<p>经过上面对主包和子包分别反编译之后会生成两个文件夹。</p>
+<p><img src="/../images/%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E5%8F%8D%E7%BC%96%E8%AF%91%E6%96%B9%E6%B3%95/image-20221204163822456.png" alt="image-20221204163822456"></p>
+<h2 id="2-4-包合并"><a href="#2-4-包合并" class="headerlink" title="2.4 包合并"></a>2.4 包合并</h2><p>进入主包的文件夹,找到app.json-&gt;subPackages-&gt;root属性</p>
+<p><img src="/../images/%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E5%8F%8D%E7%BC%96%E8%AF%91%E6%96%B9%E6%B3%95/image-20221204164020516.png" alt="image-20221204164020516"></p>
+<p>packageA即为定义的子包文件夹,将子包与该文件夹替换即可</p>
+]]></content>
+      <tags>
+        <tag>微信小程序</tag>
+        <tag>反编译</tag>
       </tags>
   </entry>
   <entry>
