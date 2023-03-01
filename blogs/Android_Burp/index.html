@@ -20,26 +20,26 @@
     var CONFIG = {"hostname":"evi133.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
   <meta property="og:type" content="article">
-<meta property="og:title" content="微信小程序反编译方法">
-<meta property="og:url" content="https://evi133.github.io/blogs/wxapp_decompile/index.html">
+<meta property="og:title" content="安卓7安装Burp证书">
+<meta property="og:url" content="https://evi133.github.io/blogs/Android_Burp/index.html">
 <meta property="og:site_name" content="evi133&#39;s blog">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://evi133.github.io/images/%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E5%8F%8D%E7%BC%96%E8%AF%91%E6%96%B9%E6%B3%95/image-20221204161559427.png">
-<meta property="og:image" content="https://evi133.github.io/images/%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E5%8F%8D%E7%BC%96%E8%AF%91%E6%96%B9%E6%B3%95/image-20221204162000740.png">
-<meta property="og:image" content="https://evi133.github.io/images/%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E5%8F%8D%E7%BC%96%E8%AF%91%E6%96%B9%E6%B3%95/image-20221204162126779.png">
-<meta property="og:image" content="https://evi133.github.io/images/%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E5%8F%8D%E7%BC%96%E8%AF%91%E6%96%B9%E6%B3%95/image-20221204162852271.png">
-<meta property="og:image" content="https://evi133.github.io/images/%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E5%8F%8D%E7%BC%96%E8%AF%91%E6%96%B9%E6%B3%95/image-20221204162951377.png">
-<meta property="og:image" content="https://evi133.github.io/images/%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E5%8F%8D%E7%BC%96%E8%AF%91%E6%96%B9%E6%B3%95/image-20221204163822456.png">
-<meta property="og:image" content="https://evi133.github.io/images/%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E5%8F%8D%E7%BC%96%E8%AF%91%E6%96%B9%E6%B3%95/image-20221204164020516.png">
-<meta property="article:published_time" content="2022-12-04T07:42:36.000Z">
-<meta property="article:modified_time" content="2022-12-04T09:11:25.962Z">
+<meta property="og:image" content="https://evi133.github.io/images/%E5%AE%89%E5%8D%937%E5%AE%89%E8%A3%85burp%E8%AF%81%E4%B9%A6/image-20230301105444018.png">
+<meta property="og:image" content="https://evi133.github.io/images/%E5%AE%89%E5%8D%937%E5%AE%89%E8%A3%85burp%E8%AF%81%E4%B9%A6/image-20230301105634497.png">
+<meta property="og:image" content="https://evi133.github.io/images/%E5%AE%89%E5%8D%937%E5%AE%89%E8%A3%85burp%E8%AF%81%E4%B9%A6/image-20230301105708213.png">
+<meta property="og:image" content="https://evi133.github.io/images/%E5%AE%89%E5%8D%937%E5%AE%89%E8%A3%85burp%E8%AF%81%E4%B9%A6/image-20230301105744766.png">
+<meta property="og:image" content="https://evi133.github.io/images/%E5%AE%89%E5%8D%937%E5%AE%89%E8%A3%85burp%E8%AF%81%E4%B9%A6/image-20230301110845410.png">
+<meta property="og:image" content="https://evi133.github.io/images/%E5%AE%89%E5%8D%937%E5%AE%89%E8%A3%85burp%E8%AF%81%E4%B9%A6/image-20230301111146264.png">
+<meta property="og:image" content="https://evi133.github.io/images/%E5%AE%89%E5%8D%937%E5%AE%89%E8%A3%85burp%E8%AF%81%E4%B9%A6/image-20230301111803737.png">
+<meta property="article:published_time" content="2023-03-01T02:46:48.000Z">
+<meta property="article:modified_time" content="2023-03-01T03:19:23.969Z">
 <meta property="article:author" content="evi133">
-<meta property="article:tag" content="微信小程序">
-<meta property="article:tag" content="反编译">
+<meta property="article:tag" content="burp">
+<meta property="article:tag" content="安卓7">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://evi133.github.io/images/%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E5%8F%8D%E7%BC%96%E8%AF%91%E6%96%B9%E6%B3%95/image-20221204161559427.png">
+<meta name="twitter:image" content="https://evi133.github.io/images/%E5%AE%89%E5%8D%937%E5%AE%89%E8%A3%85burp%E8%AF%81%E4%B9%A6/image-20230301105444018.png">
 
-<link rel="canonical" href="https://evi133.github.io/blogs/wxapp_decompile/">
+<link rel="canonical" href="https://evi133.github.io/blogs/Android_Burp/">
 
 
 <script id="page-configurations">
@@ -52,7 +52,7 @@
   };
 </script>
 
-  <title>微信小程序反编译方法 | evi133's blog</title>
+  <title>安卓7安装Burp证书 | evi133's blog</title>
   
 
 
@@ -190,7 +190,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://evi133.github.io/blogs/wxapp_decompile/">
+    <link itemprop="mainEntityOfPage" href="https://evi133.github.io/blogs/Android_Burp/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpg">
@@ -203,7 +203,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          微信小程序反编译方法
+          安卓7安装Burp证书
         </h1>
 
         <div class="post-meta">
@@ -214,7 +214,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2022-12-04 15:42:36 / 修改时间：17:11:25" itemprop="dateCreated datePublished" datetime="2022-12-04T15:42:36+08:00">2022-12-04</time>
+              <time title="创建时间：2023-03-01 10:46:48 / 修改时间：11:19:23" itemprop="dateCreated datePublished" datetime="2023-03-01T10:46:48+08:00">2023-03-01</time>
             </span>
 
           
@@ -229,36 +229,38 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h1 id="1-准备工作"><a href="#1-准备工作" class="headerlink" title="1.准备工作"></a>1.准备工作</h1><p>nodejs:<a target="_blank" rel="noopener" href="https://nodejs.org/zh-cn/download/">https://nodejs.org/zh-cn/download/</a></p>
-<p>wxappUnpacker:<a target="_blank" rel="noopener" href="https://github.com/xuedingmiaojun/wxappUnpacker">https://github.com/xuedingmiaojun/wxappUnpacker</a></p>
-<p>夜神模拟器6.6.1.1:<a target="_blank" rel="noopener" href="https://support.yeshen.com/zh-CN/win-release">https://support.yeshen.com/zh-CN/win-release</a></p>
-<p>微信8.0.24(32位):<a target="_blank" rel="noopener" href="https://weixin.qq.com/">https://weixin.qq.com/</a></p>
-<p>文件管理器</p>
-<h1 id="2-反编译微信小程序"><a href="#2-反编译微信小程序" class="headerlink" title="2.反编译微信小程序"></a>2.反编译微信小程序</h1><h2 id="2-1-删除多余小程序包"><a href="#2-1-删除多余小程序包" class="headerlink" title="2.1 删除多余小程序包"></a>2.1 删除多余小程序包</h2><p>为了避免小程序包太多,先用文件管理器把小程序的包全部删除完</p>
-<p>存放小程序包的路径为</p>
-<p>&#x2F;data&#x2F;data&#x2F;com.tencent.mm&#x2F;MicroMsg&#x2F;{User哈希值}&#x2F;appbrand&#x2F;pkg</p>
-<p>如果有多个user哈希值的目录,不清楚哪个是当前登录账号的目录,可以随便打开一个小程序,然后进入文件管理器按照时间排序,最近修改的文件夹基本上就是当前登录账号的文件夹了</p>
-<p>将文件夹内的内容全部删除</p>
-<p><img src="/../images/%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E5%8F%8D%E7%BC%96%E8%AF%91%E6%96%B9%E6%B3%95/image-20221204161559427.png" alt="image-20221204161559427"></p>
-<h2 id="2-2-获取小程序包"><a href="#2-2-获取小程序包" class="headerlink" title="2.2 获取小程序包"></a>2.2 获取小程序包</h2><p>手机进入小程序,会在对应目录生成几个包,包大致分为三种:基础包、主包、分包,基础包一般内存最大,主包其次,最小的是分包</p>
-<p>用微信打开小程序,然后返回小程序包存放目录查看</p>
-<p><img src="/../images/%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E5%8F%8D%E7%BC%96%E8%AF%91%E6%96%B9%E6%B3%95/image-20221204162000740.png" alt="image-20221204162000740"></p>
-<p>将包保存到电脑上,模拟器有文件传输助手,将文件移动到指定目录即可移动到电脑上</p>
-<p><img src="/../images/%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E5%8F%8D%E7%BC%96%E8%AF%91%E6%96%B9%E6%B3%95/image-20221204162126779.png" alt="image-20221204162126779"></p>
-<h2 id="2-3-反编译小程序包"><a href="#2-3-反编译小程序包" class="headerlink" title="2.3 反编译小程序包"></a>2.3 反编译小程序包</h2><p>先反编译主包,进入wxappUnpacker目录,执行命令</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">node wuWxapkg.js &quot;小程序包地址&quot;</span><br></pre></td></tr></table></figure>
+        <p>​	在测试Android app时，手机已经安装了burpsuite证书，但是app仍然无法访问https网络，浏览器可以访问http，https会提示此证书并非来自被信任的机构，原因是安卓7及安卓7以上的版本，在手机上安装证书是不被认可的，需要安装系统证书，步骤如下（以夜神模拟器为例）：</p>
+<h2 id="1-开启开发者选项"><a href="#1-开启开发者选项" class="headerlink" title="1.开启开发者选项"></a>1.开启开发者选项</h2><p>首先打开设置，拉到最下面有<strong>关于平板电脑</strong></p>
+<p><img src="/../images/%E5%AE%89%E5%8D%937%E5%AE%89%E8%A3%85burp%E8%AF%81%E4%B9%A6/image-20230301105444018.png" alt="image-20230301105444018"></p>
+<p>进入关于平板电脑之后，再拉到最下面<strong>版本号</strong>，连续点击五次即可唤醒开发者选项</p>
+<p><img src="/../images/%E5%AE%89%E5%8D%937%E5%AE%89%E8%A3%85burp%E8%AF%81%E4%B9%A6/image-20230301105634497.png" alt="image-20230301105634497"></p>
+<p>然后返回上一级，即可看到<strong>开发者选项</strong></p>
+<p><img src="/../images/%E5%AE%89%E5%8D%937%E5%AE%89%E8%A3%85burp%E8%AF%81%E4%B9%A6/image-20230301105708213.png" alt="image-20230301105708213"></p>
+<p>打开USB调试</p>
+<p><img src="/../images/%E5%AE%89%E5%8D%937%E5%AE%89%E8%A3%85burp%E8%AF%81%E4%B9%A6/image-20230301105744766.png" alt="image-20230301105744766"></p>
+<h2 id="2-使用adb连接模拟器"><a href="#2-使用adb连接模拟器" class="headerlink" title="2.使用adb连接模拟器"></a>2.使用adb连接模拟器</h2><p>打开夜神模拟器的安装目录，安装目录中自带adb，在当前目录唤醒cmd</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">D:\Program Files\Nox\bin&gt;adb version</span><br><span class="line">Android Debug Bridge version 1.0.36</span><br><span class="line">Revision 0e9850346394-android</span><br></pre></td></tr></table></figure>
 
-<p><img src="/../images/%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E5%8F%8D%E7%BC%96%E8%AF%91%E6%96%B9%E6%B3%95/image-20221204162852271.png" alt="image-20221204162852271"></p>
-<p>执行完成之后会在小程序包目录生成一个同名文件夹,里面就是小程序反编译后的源码</p>
-<p><img src="/../images/%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E5%8F%8D%E7%BC%96%E8%AF%91%E6%96%B9%E6%B3%95/image-20221204162951377.png" alt="image-20221204162951377"></p>
-<p>然后反编译分包</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">node wuWxapkg.js &quot;小程序包地址&quot; -s=存放路径</span><br></pre></td></tr></table></figure>
+<p>用adb进行连接（夜神模拟器的默认端口为62001）</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">D:\Program Files\Nox\bin&gt;adb connect 127.0.0.1:62001</span><br><span class="line">already connected to 127.0.0.1:62001</span><br></pre></td></tr></table></figure>
 
-<p>经过上面对主包和子包分别反编译之后会生成两个文件夹。</p>
-<p><img src="/../images/%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E5%8F%8D%E7%BC%96%E8%AF%91%E6%96%B9%E6%B3%95/image-20221204163822456.png" alt="image-20221204163822456"></p>
-<h2 id="2-4-包合并"><a href="#2-4-包合并" class="headerlink" title="2.4 包合并"></a>2.4 包合并</h2><p>进入主包的文件夹,找到app.json-&gt;subPackages-&gt;root属性</p>
-<p><img src="/../images/%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E5%8F%8D%E7%BC%96%E8%AF%91%E6%96%B9%E6%B3%95/image-20221204164020516.png" alt="image-20221204164020516"></p>
-<p>packageA即为定义的子包文件夹,将子包与该文件夹替换即可</p>
+<p>如果不知道模拟器的端口，例如多开模拟器，可以在配置文件中查看</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">D:\Program Files\Nox\bin\BignoxVMS\要连接的模拟器\Nox_1.vbox</span><br></pre></td></tr></table></figure>
+
+<p><img src="/../images/%E5%AE%89%E5%8D%937%E5%AE%89%E8%A3%85burp%E8%AF%81%E4%B9%A6/image-20230301110845410.png" alt="image-20230301110845410"></p>
+<p>查看是否连接成功</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">D:\Program Files\Nox\bin&gt;adb devices</span><br><span class="line">List of devices attached</span><br><span class="line">127.0.0.1:62001 device</span><br></pre></td></tr></table></figure>
+
+<h2 id="3-安装系统证书"><a href="#3-安装系统证书" class="headerlink" title="3.安装系统证书"></a>3.安装系统证书</h2><p>首先导出burp证书</p>
+<p><img src="/../images/%E5%AE%89%E5%8D%937%E5%AE%89%E8%A3%85burp%E8%AF%81%E4%B9%A6/image-20230301111146264.png" alt="image-20230301111146264"></p>
+<p>使用openssl将der格式转为pem格式，方便安卓识别</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">┌──(kali㉿kali)-[~/Desktop]</span><br><span class="line">└─$ openssl x509 -inform DER -in cacert.der -out cacert.pem #转为pem格式</span><br><span class="line">                                                                                                                                                                                     </span><br><span class="line">┌──(kali㉿kali)-[~/Desktop]</span><br><span class="line">└─$ mv cacert.pem `openssl x509 -inform PEM -subject_hash_old -in cacert.pem |head -1`&#x27;.0&#x27; #重命名为&lt;hash值&gt;.0</span><br></pre></td></tr></table></figure>
+
+<p>然后在adb中操作</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">D:\Program Files\Nox\bin&gt;adb root</span><br><span class="line"></span><br><span class="line">D:\Program Files\Nox\bin&gt;adb remount</span><br><span class="line">remount succeeded</span><br><span class="line"></span><br><span class="line">D:\Program Files\Nox\bin&gt;adb push &quot;9a5ba575.0&quot; /sdcard/</span><br><span class="line"><span class="meta prompt_">[100%</span><span class="language-bash">] /sdcard/9a5ba575.0</span></span><br><span class="line"></span><br><span class="line">D:\Program Files\Nox\bin&gt;adb shell</span><br><span class="line">dream2lteks:/ # mv /sdcard/9a5ba575.0 /system/etc/security/cacerts/</span><br><span class="line">dream2lteks:/ # chmod 644 /system/etc/security/cacerts/9a5ba575.0</span><br></pre></td></tr></table></figure>
+
+<p>重启手机即可看到证书，正常抓包</p>
+<p><img src="/../images/%E5%AE%89%E5%8D%937%E5%AE%89%E8%A3%85burp%E8%AF%81%E4%B9%A6/image-20230301111803737.png" alt="image-20230301111803737"></p>
 
     </div>
 
@@ -268,8 +270,8 @@
 
       <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F/" rel="tag"># 微信小程序</a>
-              <a href="/tags/%E5%8F%8D%E7%BC%96%E8%AF%91/" rel="tag"># 反编译</a>
+              <a href="/tags/burp/" rel="tag"># burp</a>
+              <a href="/tags/%E5%AE%89%E5%8D%937/" rel="tag"># 安卓7</a>
           </div>
 
         
@@ -278,13 +280,10 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/blogs/sql_injection/" rel="prev" title="sqli靶场学习要点总结">
-      <i class="fa fa-chevron-left"></i> sqli靶场学习要点总结
+    <a href="/blogs/sql_Bypass/" rel="prev" title="SQL注入Bypass-科学计数法">
+      <i class="fa fa-chevron-left"></i> SQL注入Bypass-科学计数法
     </a></div>
-      <div class="post-nav-item">
-    <a href="/blogs/sql_Bypass/" rel="next" title="SQL注入Bypass-科学计数法">
-      SQL注入Bypass-科学计数法 <i class="fa fa-chevron-right"></i>
-    </a></div>
+      <div class="post-nav-item"></div>
     </div>
       </footer>
     
@@ -343,7 +342,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-%E5%87%86%E5%A4%87%E5%B7%A5%E4%BD%9C"><span class="nav-text">1.准备工作</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-%E5%8F%8D%E7%BC%96%E8%AF%91%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F"><span class="nav-text">2.反编译微信小程序</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1-%E5%88%A0%E9%99%A4%E5%A4%9A%E4%BD%99%E5%B0%8F%E7%A8%8B%E5%BA%8F%E5%8C%85"><span class="nav-text">2.1 删除多余小程序包</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-2-%E8%8E%B7%E5%8F%96%E5%B0%8F%E7%A8%8B%E5%BA%8F%E5%8C%85"><span class="nav-text">2.2 获取小程序包</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-3-%E5%8F%8D%E7%BC%96%E8%AF%91%E5%B0%8F%E7%A8%8B%E5%BA%8F%E5%8C%85"><span class="nav-text">2.3 反编译小程序包</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-4-%E5%8C%85%E5%90%88%E5%B9%B6"><span class="nav-text">2.4 包合并</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E5%BC%80%E5%90%AF%E5%BC%80%E5%8F%91%E8%80%85%E9%80%89%E9%A1%B9"><span class="nav-text">1.开启开发者选项</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E4%BD%BF%E7%94%A8adb%E8%BF%9E%E6%8E%A5%E6%A8%A1%E6%8B%9F%E5%99%A8"><span class="nav-text">2.使用adb连接模拟器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E5%AE%89%E8%A3%85%E7%B3%BB%E7%BB%9F%E8%AF%81%E4%B9%A6"><span class="nav-text">3.安装系统证书</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
