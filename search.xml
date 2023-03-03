@@ -459,4 +459,73 @@
         <tag>js</tag>
       </tags>
   </entry>
+  <entry>
+    <title>注入中判断数据库方法小结</title>
+    <url>//blogs/sqli_dbms/</url>
+    <content><![CDATA[<p>在进行SQL注入之前，首先要判断数据库类型，只有这样才能根据类型选择合适的函数，实现SQL注入</p>
+<h2 id="1-数据库常见的搭配方式"><a href="#1-数据库常见的搭配方式" class="headerlink" title="1.数据库常见的搭配方式"></a>1.数据库常见的搭配方式</h2><table>
+<thead>
+<tr>
+<th>语言</th>
+<th>数据库</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>asp</td>
+<td>mssql，access</td>
+</tr>
+<tr>
+<td>.net</td>
+<td>mssql</td>
+</tr>
+<tr>
+<td>php</td>
+<td>mysql</td>
+</tr>
+<tr>
+<td>java</td>
+<td>oracle，mysql</td>
+</tr>
+</tbody></table>
+<h2 id="2-基于特定函数判断"><a href="#2-基于特定函数判断" class="headerlink" title="2.基于特定函数判断"></a>2.基于特定函数判断</h2><h3 id="2-1-len-和length"><a href="#2-1-len-和length" class="headerlink" title="2.1 len()和length()"></a>2.1 len()和length()</h3><p>len()：返回字符串的长度，mssql适用</p>
+<p>length()：返回字符串的长度，oracle、mysql适用</p>
+<h3 id="2-2-version-和-version"><a href="#2-2-version-和-version" class="headerlink" title="2.2 version()和@@version"></a>2.2 version()和@@version</h3><p>version()：查询版本信息的函数，mysql适用</p>
+<p>@@version：查询版本信息的函数，mysql、mssql适用</p>
+<h3 id="2-3-substring-和substr"><a href="#2-3-substring-和substr" class="headerlink" title="2.3 substring()和substr()"></a>2.3 substring()和substr()</h3><p>substring()：字符串截取函数，mysql、mssql适用</p>
+<p>substr()：字符串截取函数，mysql、oracle适用</p>
+<p>两个函数用法一样</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">substring(str,pos,length)</span><br><span class="line">substring(被截取字符串,从第几位开始截取,截取长度)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">mysql&gt; select substring(&#x27;abc&#x27;,2);</span><br><span class="line">+--------------------+</span><br><span class="line">| substring(&#x27;abc&#x27;,2) |</span><br><span class="line">+--------------------+</span><br><span class="line">| bc                 |</span><br><span class="line">+--------------------+</span><br><span class="line">1 row in set (0.00 sec)</span><br><span class="line"></span><br><span class="line">mysql&gt; select substring(&#x27;abc&#x27;,2,1);</span><br><span class="line">+----------------------+</span><br><span class="line">| substring(&#x27;abc&#x27;,2,1) |</span><br><span class="line">+----------------------+</span><br><span class="line">| b                    |</span><br><span class="line">+----------------------+</span><br><span class="line">1 row in set (0.00 sec)</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-4-特有的休眠函数"><a href="#2-4-特有的休眠函数" class="headerlink" title="2.4 特有的休眠函数"></a>2.4 特有的休眠函数</h3><p>mysql：benchmark()</p>
+<p>mssql：waitfor delay ‘0:0:10’</p>
+<p>oracle：DBMS_PIPE.RECEIVE_MESSAGE()</p>
+<h2 id="2-基于报错信息判断"><a href="#2-基于报错信息判断" class="headerlink" title="2.基于报错信息判断"></a>2.基于报错信息判断</h2><p>mysql：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">you have an error in your SQL syntax,check the manual that corresponds to you mysql server version for the right stntax to use near &#x27;&#x27;foo&#x27; at line x</span><br></pre></td></tr></table></figure>
+
+<p>mssql：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sg 170,level 15, State 1,Line 1</span><br><span class="line">Line 1:Incorrect syntax near ‘foo</span><br><span class="line">Msg 105,level 15,state 1,Line 1</span><br><span class="line">Unclose quotation mark before the character string ‘foo</span><br></pre></td></tr></table></figure>
+
+<p>oracle：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ORA-01756:quoted string not properly terminated</span><br><span class="line">ORA-00933:SQLcommand not properly ended</span><br></pre></td></tr></table></figure>
+
+<h2 id="3-基于注释符判断"><a href="#3-基于注释符判断" class="headerlink" title="3.基于注释符判断"></a>3.基于注释符判断</h2><p>mysql：# – &#x2F;**&#x2F;</p>
+<p>mssql：– &#x2F;**&#x2F;</p>
+<p>oracle：– &#x2F;**&#x2F;</p>
+<h2 id="4-基于空白字符判断"><a href="#4-基于空白字符判断" class="headerlink" title="4.基于空白字符判断"></a>4.基于空白字符判断</h2><p>mysql：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">%20 %09 %0a %0b %0c %0d %a0</span><br></pre></td></tr></table></figure>
+
+<p>mssql：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">0x00-0x20</span><br></pre></td></tr></table></figure>
+
+<p>oracle：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">%20 %09 %00 %0a %0b %0c %0d</span><br></pre></td></tr></table></figure>
+
+<p>oracle不能用%a0</p>
+<p>mysql不能用%00</p>
+]]></content>
+      <tags>
+        <tag>SQL注入</tag>
+        <tag>数据库</tag>
+      </tags>
+  </entry>
 </search>
